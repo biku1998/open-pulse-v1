@@ -4,3 +4,4 @@ dist/
 .prettierrc.js
 .eslintrc.js
 env.d.ts
+vite.config.ts

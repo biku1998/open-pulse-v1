@@ -22,7 +22,6 @@ module.exports = {
         paths: ["src"],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
-      typescript: {},
     },
   },
   parserOptions: {
@@ -31,9 +30,9 @@ module.exports = {
   },
   plugins: ["react-refresh", "@tanstack/query"],
   rules: {
-    "react-refresh/only-export-components": [
-      "warn",
-      { allowConstantExport: true },
-    ],
+    // "react-refresh/only-export-components": [
+    //   "warn",
+    //   { allowConstantExport: true },
+    // ],
   },
 };
