@@ -30,7 +30,7 @@ create table public.projects (
 create table public.tokens (
     id uuid not null default gen_random_uuid (),
     created_at timestamp with time zone not null default now(),
-    created_by uuid null,
+    created_by uuid not null,
     is_active boolean not null default true,
     value text not null,
     constraint tokens_pkey primary key (id),
@@ -42,7 +42,7 @@ create table public.project_tokens (
     created_at timestamp with time zone not null default now(),
     token_id uuid not null,
     project_id uuid not null,
-    created_by uuid null,
+    created_by uuid not null,
     constraint project_tokens_pkey primary key (id),
     constraint unique_project_token unique (project_id, token_id),
     constraint project_tokens_token_id_fkey foreign key (token_id) references tokens (id) on delete cascade,
