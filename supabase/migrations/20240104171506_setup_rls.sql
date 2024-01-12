@@ -21,3 +21,5 @@ with check ((auth.uid() = created_by));
 alter table if exists public.insights enable row level security;
 
 alter table if exists public.events enable row level security;
+
+alter table if exists public.event_tags enable row level security;
