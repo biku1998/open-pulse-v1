@@ -7,3 +7,7 @@
 ```sh
 supabase gen types typescript --local > ./frontend/src/types/supabase-db.ts
 ```
+
+```sh
+supabase gen types typescript --local > ./backend/src/types/supabase-db.ts
+```

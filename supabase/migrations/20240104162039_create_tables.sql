@@ -34,7 +34,8 @@ create table public.tokens (
     is_active boolean not null default true,
     value text not null,
     constraint tokens_pkey primary key (id),
-    constraint tokens_created_by_fkey foreign key (created_by) references users (id) on delete cascade
+    constraint tokens_created_by_fkey foreign key (created_by) references users (id) on delete cascade,
+    constraint unique_token_value unique (value)
   ) tablespace pg_default;
 
 create table public.project_tokens (
@@ -75,9 +76,11 @@ create table public.insights (
     value text not null,
     icon text null,
     project_id uuid not null,
+    created_by uuid not null,
     constraint insights_pkey primary key (id),
     constraint unique_project_insight unique (project_id, name),
-    constraint insights_project_id_fkey foreign key (project_id) references projects (id)
+    constraint insights_project_id_fkey foreign key (project_id) references projects (id) on delete cascade,
+    constraint insights_created_by_fkey foreign key (created_by) references users (id) on delete cascade
 ) tablespace pg_default;
 
 create table public.events (
@@ -88,8 +91,10 @@ create table public.events (
     description text null,
     icon text null,
     channel_id uuid not null,
+    created_by uuid not null,
     constraint events_pkey primary key (id),
-    constraint events_channel_id_fkey foreign key (channel_id) references channels (id)
+    constraint events_channel_id_fkey foreign key (channel_id) references channels (id) on delete cascade,
+    constraint events_created_by_fkey foreign key (created_by) references users (id) on delete cascade
 ) tablespace pg_default;
 
 
@@ -99,8 +104,10 @@ create table public.event_tags (
     key text not null,
     value text not null,
     event_id bigint not null,
+    created_by uuid not null,
     constraint event_tags_pkey primary key (id),
-    constraint event_tags_event_id_fkey foreign key (event_id) references events (id)
+    constraint event_tags_event_id_fkey foreign key (event_id) references events (id) on delete cascade,
+    constraint event_tags_created_by_fkey foreign key (created_by) references users (id) on delete cascade
 ) tablespace pg_default;
 
 

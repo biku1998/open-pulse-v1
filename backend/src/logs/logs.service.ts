@@ -16,7 +16,7 @@ export class LogsService {
 
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async createLog(createLogDto: CreateLogDto) {
+  async createLog(createLogDto: CreateLogDto, ownerUserId: string) {
     const {
       projectId,
       channelId,
@@ -30,7 +30,7 @@ export class LogsService {
     this.logger.log(
       `${
         this.createLog.name
-      } called with projectId [${projectId}], channelId [${channelId}], event [${event}], userId [${userId}], description [${description}], icon [${icon}], tags [${JSON.stringify(
+      } called with projectId [${projectId}], channelId [${channelId}], event [${event}], userId [${userId}], description [${description}], icon [${icon}], ownerUserId [${ownerUserId}], tags [${JSON.stringify(
         tags,
       )}]`,
     );
@@ -40,7 +40,7 @@ export class LogsService {
       const projects = await this.databaseService.sql<
         Pick<Database['public']['Tables']['projects']['Row'], 'id'>[]
       >`
-    SELECT id FROM projects WHERE id = ${projectId}
+    SELECT id FROM projects WHERE id = ${projectId} AND created_by = ${ownerUserId}
     `;
 
       if (projects.length === 0) {
@@ -50,8 +50,8 @@ export class LogsService {
       const createEventResp = await this.databaseService.sql<
         Database['public']['Tables']['events']['Row'][]
       >`
-      INSERT INTO events (channel_id, name, user_id, description, icon)
-      VALUES (${channelId}, ${event}, ${userId}, ${description}, ${icon})
+      INSERT INTO events (channel_id, name, user_id, description, icon, created_by)
+      VALUES (${channelId}, ${event}, ${userId}, ${description}, ${icon}, ${ownerUserId})
       RETURNING id
       `;
 
@@ -63,6 +63,7 @@ export class LogsService {
         event_id: eventId,
         key: tag.key,
         value: tag.value,
+        created_by: ownerUserId,
       }));
       await this.databaseService.sql`
       INSERT INTO event_tags ${this.databaseService.sql(
@@ -70,6 +71,7 @@ export class LogsService {
         'event_id',
         'key',
         'value',
+        'created_by',
       )}
       RETURNING id;
       `;

@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module';
 import { LogsModule } from './logs/logs.module';
 import { ProjectsModule } from './projects/projects.module';
 import { InsightsModule } from './insights/insights.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { InsightsModule } from './insights/insights.module';
     LogsModule,
     ProjectsModule,
     InsightsModule,
+    SupabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
