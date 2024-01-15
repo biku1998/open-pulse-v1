@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 import {
@@ -12,6 +13,7 @@ import {
   FormMessage,
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
+import { AuthSuccessResponse, useRegister } from "../api";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -24,7 +26,20 @@ const FormSchema = z.object({
     ),
 });
 
-export default function RegisterForm() {
+type RegisterFormProps = {
+  onRegister: (resp: AuthSuccessResponse) => void;
+};
+
+export default function RegisterForm(props: RegisterFormProps) {
+  const { onRegister } = props;
+
+  const registerMutation = useRegister({
+    onSuccess: onRegister,
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -34,7 +49,7 @@ export default function RegisterForm() {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+    registerMutation.mutate(data);
   }
 
   return (
@@ -83,10 +98,14 @@ export default function RegisterForm() {
               )}
             />
             <Button
+              disabled={registerMutation.isPending}
               type="submit"
               className="w-full mt-2 animate-in slide-in-from-bottom-2"
             >
-              Register
+              {registerMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {registerMutation.isPending ? "Please wait..." : "Register"}
             </Button>
           </div>
         </form>

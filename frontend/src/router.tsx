@@ -1,4 +1,5 @@
 import { Navigate, Outlet, createBrowserRouter } from "react-router-dom";
+import AuthGuard from "./auth/components/auth-guard";
 import LoginPage from "./auth/pages/login";
 import RegisterPage from "./auth/pages/register";
 import RootErrorPage from "./components/root-error-page";
@@ -9,7 +10,11 @@ import ProjectPage from "./project/pages";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />,
+    element: (
+      <AuthGuard>
+        <RootLayout />
+      </AuthGuard>
+    ),
     errorElement: <RootErrorPage />,
     children: [
       {
@@ -33,8 +38,16 @@ const router = createBrowserRouter([
     errorElement: <RootErrorPage />,
   },
   {
+    path: "*",
+    element: <div>Not found page!!</div>,
+  },
+  {
     path: "/project/:id",
-    element: <ProjectPage />,
+    element: (
+      <AuthGuard>
+        <ProjectPage />
+      </AuthGuard>
+    ),
     errorElement: <RootErrorPage />,
     children: [
       {
