@@ -5,6 +5,7 @@ import RegisterPage from "./auth/pages/register";
 import RootErrorPage from "./components/root-error-page";
 import RootLayout from "./components/root-layout";
 import HomePage from "./home/pages";
+import PageNotFound from "./pages/404";
 import ProjectPage from "./project/pages";
 
 const router = createBrowserRouter([
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <div>Not found page!!</div>,
+    element: <PageNotFound />,
   },
   {
     path: "/project/:id",
