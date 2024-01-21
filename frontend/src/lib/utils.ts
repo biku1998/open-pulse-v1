@@ -29,3 +29,21 @@ export const convertToCamelCase = <T>(obj: any): T => {
 };
 
 export const toast = sonnerToast;
+
+export const createShortForm = (inputString: string): string => {
+  // Split the input string into words
+  const words: string[] = inputString.split(" ");
+
+  // Initialize an empty string to store the short form
+  let shortForm: string = "";
+
+  // Iterate through each word and append the first letter to the short form
+  for (let i = 0; i < Math.min(words.length, 2); i++) {
+    const word = words[i];
+    if (word.length > 0) {
+      shortForm += word[0].toUpperCase();
+    }
+  }
+
+  return shortForm;
+};

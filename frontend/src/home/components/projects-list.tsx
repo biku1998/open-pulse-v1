@@ -11,9 +11,17 @@ export default function ProjectsList() {
   return (
     <div className="grid grid-cols-4 gap-6">
       {fetchProjectsQuery.data
-        ? fetchProjectsQuery.data.map(({ project }) => (
-            <ProjectCard key={project.id} />
-          ))
+        ? fetchProjectsQuery.data.map(
+            ({ project, channelCount, insightCount }) => (
+              <ProjectCard
+                key={project.id}
+                name={project.name}
+                id={project.id}
+                channelsCount={channelCount}
+                insightsCount={insightCount}
+              />
+            ),
+          )
         : null}
     </div>
   );
