@@ -24,25 +24,25 @@ const navItems: {
     icon: <Rss className=" group-hover:text-primary" />,
   },
   {
-    path: "/charts",
+    path: "/chart",
     index: false,
     label: "Charts",
     icon: <BarChart4 className=" group-hover:text-primary" />,
   },
   {
-    path: "/insights",
+    path: "/insight",
     index: false,
     label: "Insights",
     icon: <Lightbulb className=" group-hover:text-primary" />,
   },
   {
-    path: "/channels",
+    path: "/channel",
     index: false,
     label: "Channels",
     icon: <Hash className=" group-hover:text-primary" />,
   },
   {
-    path: "/settings",
+    path: "/setting",
     index: false,
     label: "Settings",
     icon: <Settings className=" group-hover:text-primary" />,
@@ -50,7 +50,7 @@ const navItems: {
 ];
 
 export default function Navbar() {
-  const { id: projectId } = useParams();
+  const { projectId } = useParams();
   const location = useLocation();
 
   const currentPath = location.pathname;

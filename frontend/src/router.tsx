@@ -7,6 +7,7 @@ import RootLayout from "./components/root-layout";
 import HomePage from "./home/pages";
 import PageNotFound from "./pages/404";
 import ProjectPage from "./project/pages";
+import FeedPage from "./project/pages/feed";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
     element: <PageNotFound />,
   },
   {
-    path: "/project/:id",
+    path: "/project/:projectId",
     element: (
       <AuthGuard>
         <ProjectPage />
@@ -53,22 +54,22 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <div>Feed</div>,
+        element: <FeedPage />,
       },
       {
-        path: "charts",
+        path: "chart",
         element: <div>Charts</div>,
       },
       {
-        path: "insights",
+        path: "insight",
         element: <div>Insights</div>,
       },
       {
-        path: "settings",
+        path: "setting",
         element: <div>Settings</div>,
       },
       {
-        path: "channels",
+        path: "channel",
         element: (
           <div className="flex flex-col gap-4">
             <span>Channels</span> <Outlet />
@@ -76,7 +77,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: ":id",
+            path: ":channelId",
             element: <div>Single Channel</div>,
           },
         ],

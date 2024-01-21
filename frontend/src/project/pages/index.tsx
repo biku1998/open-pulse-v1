@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { Check, ChevronRight, ChevronsUpDown } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import {
@@ -15,21 +15,25 @@ import {
   PopoverTrigger,
 } from "../../components/ui/popover";
 import { Skeleton } from "../../components/ui/skeleton";
+import UserMenu from "../../components/user-menu";
 import { HEADER_HEIGHT, NAVBAR_WIDTH } from "../../constants";
 import { useFetchProjects } from "../../home/queries";
 import { cn } from "../../lib/utils";
 import Navbar from "../components/navbar";
 
 export default function ProjectPage() {
-  const { id: projectId = "" } = useParams();
+  const { projectId = "" } = useParams();
+  const location = useLocation();
 
   const fetchProjectsQuery = useFetchProjects();
 
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(projectId);
+  const [selectProjectPopoverOpen, setSelectProjectPopoverOpen] =
+    React.useState(false);
+
+  const closeSelectProjectPopover = () => setSelectProjectPopoverOpen(false);
 
   return (
-    <main className="flex flex-col items-center relative pt-24">
+    <main className="relative py-24">
       <Navbar />
       <header
         className="absolute top-0 flex items-center w-full"
@@ -50,17 +54,20 @@ export default function ProjectPage() {
           ) : null}
 
           {fetchProjectsQuery.data ? (
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover
+              open={selectProjectPopoverOpen}
+              onOpenChange={setSelectProjectPopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
                   role="combobox"
-                  aria-expanded={open}
+                  aria-expanded={selectProjectPopoverOpen}
                   className="min-w-[200px] justify-between text-zinc-600 animate-in slide-in-from-bottom-2"
                 >
-                  {value
+                  {projectId
                     ? fetchProjectsQuery.data.find(
-                        ({ project }) => project.id === value,
+                        ({ project }) => project.id === projectId,
                       )?.project.name
                     : "Select project..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -72,22 +79,20 @@ export default function ProjectPage() {
                   <CommandEmpty>No project found.</CommandEmpty>
                   <CommandGroup>
                     {fetchProjectsQuery.data.map(({ project }) => (
-                      <Link key={project.id} to={`/project/${project.id}`}>
+                      <Link
+                        key={project.id}
+                        to={location.pathname.replace(projectId, project.id)}
+                      >
                         <CommandItem
                           key={project.id}
                           value={project.id}
-                          onSelect={(currentValue) => {
-                            setValue(
-                              currentValue === value ? "" : currentValue,
-                            );
-                            setOpen(false);
-                          }}
+                          onSelect={closeSelectProjectPopover}
                           className="cursor-pointer"
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              value === project.id
+                              projectId === project.id
                                 ? "opacity-100"
                                 : "opacity-0",
                             )}
@@ -101,9 +106,20 @@ export default function ProjectPage() {
               </PopoverContent>
             </Popover>
           ) : null}
+
+          <div className="ml-auto">
+            <UserMenu />
+          </div>
         </div>
       </header>
-      <Outlet />
+      <div
+        style={{
+          paddingLeft: `${NAVBAR_WIDTH}px`,
+        }}
+        className="w-full"
+      >
+        <Outlet />
+      </div>
     </main>
   );
 }
