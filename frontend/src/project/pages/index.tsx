@@ -33,10 +33,10 @@ export default function ProjectPage() {
   const closeSelectProjectPopover = () => setSelectProjectPopoverOpen(false);
 
   return (
-    <main className="relative py-24">
+    <main className="relative">
       <Navbar />
       <header
-        className="absolute top-0 flex items-center w-full"
+        className="fixed top-0 flex items-center bg-white w-full z-10"
         style={{
           height: `${HEADER_HEIGHT}px`,
           paddingLeft: `${NAVBAR_WIDTH}px`,
@@ -115,8 +115,9 @@ export default function ProjectPage() {
       <div
         style={{
           paddingLeft: `${NAVBAR_WIDTH}px`,
+          paddingTop: `${HEADER_HEIGHT}px`,
         }}
-        className="w-full"
+        className="w-full "
       >
         <Outlet />
       </div>

@@ -12,6 +12,27 @@ create table public.users (
     constraint users_id_fkey foreign key (id) references auth.users (id) on delete cascade
 ) tablespace pg_default;
 
+-- insert a row in public.users when a new user is created in auth.users
+
+create function public.create_public_user_for_auth_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.users(id, email, name) 
+  values 
+  (new.id, new.email, 'Pied piper');
+  return new;
+end;
+$$;
+
+-- trigger
+
+create trigger create_public_user_for_auth_user
+  after insert on auth.users
+  for each row execute procedure public.create_public_user_for_auth_user();
+
 
 create table public.projects (
     id uuid not null default gen_random_uuid (),
@@ -91,9 +112,11 @@ create table public.events (
     description text null,
     icon text null,
     channel_id uuid not null,
+    project_id uuid not null,
     created_by uuid not null,
     constraint events_pkey primary key (id),
     constraint events_channel_id_fkey foreign key (channel_id) references channels (id) on delete cascade,
+    constraint events_project_id_fkey foreign key (project_id) references projects (id) on delete cascade,
     constraint events_created_by_fkey foreign key (created_by) references users (id) on delete cascade
 ) tablespace pg_default;
 

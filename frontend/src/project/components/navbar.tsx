@@ -57,9 +57,14 @@ export default function Navbar() {
 
   if (!projectId) return <Navigate to="/auth/login" replace={true} />;
 
+  const isPathActive = (path: string) => {
+    if (path === "") return currentPath === `/project/${projectId}`;
+    return currentPath.split("/").includes(path.split("/")[1]);
+  };
+
   return (
     <nav
-      className="fixed left-0 h-screen top-0 border-r border-solid border-zinc-200 flex flex-col py-4 items-center gap-8 z-10"
+      className="fixed left-0 h-screen top-0 border-r border-solid border-zinc-200 flex flex-col py-4 items-center gap-8 z-20"
       style={{
         width: `${NAVBAR_WIDTH}px`,
       }}
@@ -75,7 +80,7 @@ export default function Navbar() {
                   to={`/project/${projectId}${item.path}`}
                   className={cn(
                     "h-[48px] w-[48px] rounded-[6px] flex flex-col items-center justify-center hover:bg-zinc-50 hover:cursor-pointer group transition-colors duration-200",
-                    currentPath === `/project/${projectId}${item.path}`
+                    isPathActive(item.path)
                       ? "bg-violet-50 text-primary"
                       : "bg-white text-zinc-500",
                   )}

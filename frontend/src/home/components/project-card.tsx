@@ -38,14 +38,18 @@ export default function ProjectCard(props: ProjectCardProps) {
             <div className="flex items-center gap-1">
               <Hash className="mr-2 h-5 w-5 text-zinc-400" />
               <span className="text-zinc-700 text-sm">
-                {channelsCount} Channels
+                {channelsCount === 1
+                  ? `${channelsCount} Channel`
+                  : `${channelsCount} Channels`}
               </span>
             </div>
 
             <div className="flex items-center gap-1">
               <Lightbulb className="mr-2 h-5 w-5 text-zinc-400" />
               <span className="text-zinc-700 text-sm">
-                {insightsCount} Insights
+                {insightsCount === 1
+                  ? `${insightsCount} Insight`
+                  : `${insightsCount} Insights`}
               </span>
             </div>
           </div>

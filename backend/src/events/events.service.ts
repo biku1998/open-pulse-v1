@@ -5,18 +5,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateLogDto } from './create-log.dto';
+import { CreateEventDto } from './create-event.dto';
 import { Database } from '../types/supabase-db';
 import { PostgresError } from 'postgres';
 import PostgresErrorCode from 'src/database/error-code';
 
 @Injectable()
-export class LogsService {
-  private readonly logger = new Logger(LogsService.name);
+export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
 
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async createLog(createLogDto: CreateLogDto, ownerUserId: string) {
+  async logEvent(logEventDto: CreateEventDto, ownerUserId: string) {
     const {
       projectId,
       channelId,
@@ -25,11 +25,11 @@ export class LogsService {
       description = null,
       icon = null,
       tags = [],
-    } = createLogDto;
+    } = logEventDto;
 
     this.logger.log(
       `${
-        this.createLog.name
+        this.logEvent.name
       } called with projectId [${projectId}], channelId [${channelId}], event [${event}], userId [${userId}], description [${description}], icon [${icon}], ownerUserId [${ownerUserId}], tags [${JSON.stringify(
         tags,
       )}]`,
@@ -50,8 +50,8 @@ export class LogsService {
       const createEventResp = await this.databaseService.sql<
         Database['public']['Tables']['events']['Row'][]
       >`
-      INSERT INTO events (channel_id, name, user_id, description, icon, created_by)
-      VALUES (${channelId}, ${event}, ${userId}, ${description}, ${icon}, ${ownerUserId})
+      INSERT INTO events (project_id, channel_id, name, user_id, description, icon, created_by)
+      VALUES (${projectId}, ${channelId}, ${event}, ${userId}, ${description}, ${icon}, ${ownerUserId})
       RETURNING id
       `;
 
@@ -80,15 +80,15 @@ export class LogsService {
 
       if (error instanceof PostgresError) {
         if (error.code === PostgresErrorCode.FOREIGN_KEY_VIOLATION) {
-          this.logger.error(`[${this.createLog.name}] foreign key violation`);
+          this.logger.error(`[${this.logEvent.name}] foreign key violation`);
           throw new NotFoundException('project or channel does not exist');
         }
       }
 
-      this.logger.error(`[${this.createLog.name}] ${error.message}}`);
+      this.logger.error(`[${this.logEvent.name}] ${error.message}}`);
 
       throw new InternalServerErrorException(
-        `[${this.createLog.name}] something went wrong!!`,
+        `[${this.logEvent.name}] something went wrong!!`,
       );
     }
   }

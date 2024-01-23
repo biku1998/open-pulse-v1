@@ -19,7 +19,13 @@ create policy ownership on public.project_tokens as permissive for all to public
 with check ((auth.uid() = created_by));
 
 alter table if exists public.insights enable row level security;
+create policy ownership on public.insights as permissive for all to public using ((auth.uid() = created_by))
+with check ((auth.uid() = created_by));
 
 alter table if exists public.events enable row level security;
+create policy ownership on public.events as permissive for all to public using ((auth.uid() = created_by))
+with check ((auth.uid() = created_by));
 
 alter table if exists public.event_tags enable row level security;
+create policy ownership on public.event_tags as permissive for all to public using ((auth.uid() = created_by))
+with check ((auth.uid() = created_by));

@@ -8,13 +8,16 @@ type EventLogCardProps = {
   event: Pick<Event, "id" | "name" | "description" | "createdAt" | "icon">;
   channel: Pick<Channel, "name" | "id">;
   projectId: string;
+  handleDeleteEvent: () => void;
+  handleMaximizeEvent: () => void;
 };
 
 export default function EventLogCard(props: EventLogCardProps) {
-  const { event, channel, projectId } = props;
+  const { event, channel, projectId, handleDeleteEvent, handleMaximizeEvent } =
+    props;
 
   return (
-    <div className="relative group p-5 flex gap-5 border border-zinc-100 rounded-[8px] hover:border-zinc-200 w-[560px]">
+    <div className="relative group p-5 flex gap-5 border border-zinc-100 rounded-[8px] hover:border-zinc-200 w-[560px] animate-in slide-in-from-bottom-2">
       <div className="w-12 h-12 px-2 py-[10px] bg-green-50 flex items-center justify-center rounded-[8px]">
         <span>{event.icon}</span>
       </div>
@@ -22,13 +25,14 @@ export default function EventLogCard(props: EventLogCardProps) {
       <div className="flex flex-col w-full">
         <h3 className="font-semibold text-zinc-950">{event.name}</h3>
         <div className="items-center hidden group-hover:flex absolute top-5 right-5 animate-in slide-in-from-bottom-2 duration-300">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleMaximizeEvent}>
             <Maximize2 className="h-4 w-4 text-zinc-500" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             className="hover:bg-red-50 text-zinc-500 hover:text-red-500"
+            onClick={handleDeleteEvent}
           >
             <Trash className="h-4 w-4" />
           </Button>
@@ -44,7 +48,7 @@ export default function EventLogCard(props: EventLogCardProps) {
             className="text-zinc-500 flex items-center text-sm  group-hover:text-primary"
           >
             <Hash className="mr-1 h-4 w-4" />
-            {channel.id}
+            {channel.name}
           </Link>
 
           <div className="flex items-center text-sm text-zinc-500">

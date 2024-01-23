@@ -10,6 +10,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 // eslint-disable-next-line import/no-unresolved
 import { Toaster, toast } from "sonner";
 import AuthLoader from "./auth/components/auth-loader";
+import ConfirmationDialog from "./components/confirmation-dialog";
 import "./index.css";
 import router from "./router";
 
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthLoader>
         <Toaster richColors />
+        <ConfirmationDialog />
         <RouterProvider router={router} />
       </AuthLoader>
       <ReactQueryDevtools initialIsOpen={false} />

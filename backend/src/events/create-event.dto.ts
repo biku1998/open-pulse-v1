@@ -18,7 +18,7 @@ export class Tag {
   readonly value: string;
 }
 
-export class CreateLogDto {
+export class CreateEventDto {
   @IsNotEmpty()
   @IsUUID()
   readonly projectId: string;

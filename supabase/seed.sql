@@ -88,21 +88,6 @@ values
   );
 
   
-insert into
-  public.users (id, name, email)
-values
-  (
-    (
-      select
-        id
-      from
-        auth.users
-      where
-        email = 'biku@gmail.com'
-    ),
-    'Biku',
-    'biku@gmail.com'
-  );
 
 insert into
   public.projects (name, created_by)

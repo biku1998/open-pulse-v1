@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { HttpModule } from '@nestjs/axios';
 import { DatabaseModule } from './database/database.module';
-import { LogsModule } from './logs/logs.module';
+import { EventsModule } from './events/events.module';
 import { ProjectsModule } from './projects/projects.module';
 import { InsightsModule } from './insights/insights.module';
 import { SupabaseModule } from './supabase/supabase.module';
@@ -19,7 +19,7 @@ import { SupabaseModule } from './supabase/supabase.module';
     HealthModule,
     HttpModule,
     DatabaseModule,
-    LogsModule,
+    EventsModule,
     ProjectsModule,
     InsightsModule,
     SupabaseModule,
