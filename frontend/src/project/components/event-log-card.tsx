@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 import { Dot, Hash, Maximize2, Trash } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../components/ui/tooltip";
+import dayjs from "../../lib/dayjs";
 import { Channel } from "../../types/channel";
 import { Event } from "../../types/event";
 
@@ -38,9 +45,28 @@ export default function EventLogCard(props: EventLogCardProps) {
           </Button>
         </div>
 
-        <p className="text-sm text-zinc-600 mt-2 max-w-[280px] truncate">
-          {event.description}
-        </p>
+        {event.description ? (
+          event.description.split("").length > 37 ? (
+            <TooltipProvider>
+              <Tooltip delayDuration={500}>
+                <TooltipTrigger asChild>
+                  <p className="text-sm text-zinc-600 mt-2 max-w-[280px] truncate">
+                    {event.description}
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm text-zinc-600 max-w-[280px]">
+                    {event.description}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <p className="text-sm text-zinc-600 mt-2 max-w-[280px] truncate">
+              {event.description}
+            </p>
+          )
+        ) : null}
 
         <div className="flex items-center gap-2 mt-3">
           <Link
@@ -53,7 +79,9 @@ export default function EventLogCard(props: EventLogCardProps) {
 
           <div className="flex items-center text-sm text-zinc-500">
             <Dot className="text-zinc-400" />
-            <span>{event.createdAt}</span>
+            <span>
+              {dayjs(event.createdAt).format("DD/MM/YYYY, hh:mm:ss A")}
+            </span>
           </div>
         </div>
       </div>

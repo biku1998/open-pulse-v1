@@ -1,14 +1,16 @@
 import { useParams } from "react-router-dom";
-import { Skeleton } from "../../components/ui/skeleton";
-import { useConfirmationDialog } from "../../zustand-stores";
-import EventLogCard from "../components/event-log-card";
-import { useDeleteEvent } from "../mutations";
-import { useFetchEvents } from "../queries";
+import { useQueryClient } from "@tanstack/react-query";
+import _keyBy from "lodash/keyBy";
+import { Skeleton } from "../../../components/ui/skeleton";
+import { useConfirmationDialog } from "../../../zustand-stores";
+import EventLogCard from "../../components/event-log-card";
+import { useDeleteEvent } from "../../mutations";
+import { useFetchChannelEvents, useFetchChannels } from "../queries";
+import { channelKeys } from "../query-keys";
 
-export default function FeedPage() {
-  const { projectId = "" } = useParams();
-
-  // const [selectedEvent, setSelectedEvent] = React.useState<string | null>(null);
+export default function SingleChannelPage() {
+  const { projectId = "", channelId = "" } = useParams();
+  const queryClient = useQueryClient();
 
   const { openConfirmationDialog, closeConfirmationDialog } =
     useConfirmationDialog((store) => ({
@@ -16,8 +18,23 @@ export default function FeedPage() {
       closeConfirmationDialog: store.closeConfirmationDialog,
     }));
 
-  const fetchEventsQuery = useFetchEvents(projectId);
-  const deleteEventMutation = useDeleteEvent();
+  const fetchChannelEventsQuery = useFetchChannelEvents({
+    projectId,
+    channelId,
+  });
+
+  const deleteEventMutation = useDeleteEvent({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: channelKeys.events(projectId, channelId),
+      });
+    },
+  });
+
+  const fetchChannelsQuery = useFetchChannels(projectId);
+
+  const isLoading =
+    fetchChannelEventsQuery.isPending || fetchChannelsQuery.isPending;
 
   const handleDeleteEvent = (id: number) => {
     openConfirmationDialog({
@@ -44,9 +61,14 @@ export default function FeedPage() {
     console.log(id);
   };
 
+  const channelInfoById = _keyBy(
+    fetchChannelsQuery.data ? fetchChannelsQuery.data : {},
+    "id",
+  );
+
   return (
     <div className="flex flex-col items-center gap-5 py-6">
-      {fetchEventsQuery.isPending ? (
+      {isLoading ? (
         <>
           <Skeleton className="h-[130px] w-[560px] rounded-[8px]" />
           <Skeleton className="h-[130px] w-[560px] rounded-[8px]" />
@@ -55,35 +77,18 @@ export default function FeedPage() {
         </>
       ) : null}
 
-      {fetchEventsQuery.data
-        ? fetchEventsQuery.data.map(({ event, channel }) => (
+      {fetchChannelEventsQuery.data && fetchChannelsQuery.data
+        ? fetchChannelEventsQuery.data.map((event) => (
             <EventLogCard
               key={event.id}
               event={event}
-              channel={channel}
+              channel={channelInfoById[event.channelId]}
               projectId={projectId}
               handleDeleteEvent={() => handleDeleteEvent(event.id)}
               handleMaximizeEvent={() => handleMaximizeEvent(event.id)}
             />
           ))
         : null}
-      {/* <EventLogCard
-        event={{
-          id: 101,
-          name: "Successful payment",
-          description:
-            "2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping 2x 1TB SSD - Overnight Shipping",
-          createdAt: "Today at 11:03 pm",
-          icon: "✅",
-        }}
-        channel={{
-          id: "101",
-          name: "product-payments",
-        }}
-        projectId={projectId}
-        handleDeleteEvent={() => handleDeleteEvent("101")}
-        handleMaximizeEvent={() => handleMaximizeEvent("101")}
-      /> */}
     </div>
   );
 }

@@ -3,9 +3,6 @@ import CreateProjectDialog from "../components/create-project-dialog";
 import ProjectsList from "../components/projects-list";
 
 export default function HomePage() {
-  // const onCreate = (project: Project) => {
-  //   toast.success(`Project ${project.name} created!`);
-  // };
   return (
     <>
       <Header />

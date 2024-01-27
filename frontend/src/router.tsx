@@ -7,8 +7,10 @@ import RootLayout from "./components/root-layout";
 import HomePage from "./home/pages";
 import PageNotFound from "./pages/404";
 import ChannelPage from "./project/channel/pages";
+import SingleChannelPage from "./project/channel/pages/single-channel";
 import ProjectPage from "./project/pages";
 import FeedPage from "./project/pages/feed";
+import SettingPage from "./project/setting/pages";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +69,7 @@ const router = createBrowserRouter([
       },
       {
         path: "setting",
-        element: <div>Settings</div>,
+        element: <SettingPage />,
       },
       {
         path: "channel",
@@ -75,7 +77,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: ":channelId",
-            element: <div>Single Channel</div>,
+            element: <SingleChannelPage />,
           },
         ],
       },

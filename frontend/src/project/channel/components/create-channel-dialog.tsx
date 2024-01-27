@@ -3,47 +3,54 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
 import * as z from "zod";
-import { useGetUser } from "../../auth/user-store";
-import { Button } from "../../components/ui/button";
+import { useGetUser } from "../../../auth/user-store";
+import { Button } from "../../../components/ui/button";
 import {
   Dialog,
-  DialogHeader,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
-} from "../../components/ui/dialog";
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../components/ui/dialog";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-  Form,
-} from "../../components/ui/form";
-import { Input } from "../../components/ui/input";
-import { toast } from "../../lib/utils";
-import { useCreateProject } from "../mutations";
+} from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
+import { toast } from "../../../lib/utils";
+import { useCreateChannel } from "../mutations";
 
 const FormSchema = z.object({
   name: z
     .string()
     .min(4, {
-      message: "Project name must be at least 4 characters.",
+      message: "Channel name must be at least 4 characters.",
     })
     .trim(),
 });
 
-export default function CreateProjectDialog() {
+type CreateChannelDialogProps = {
+  disabled: boolean;
+  projectId: string;
+  channelCount: number;
+};
+export default function CreateChannelDialog(props: CreateChannelDialogProps) {
+  const { disabled, projectId, channelCount } = props;
+
   const [open, setOpen] = React.useState(false);
 
   const user = useGetUser();
 
-  const createProjectMutation = useCreateProject({
-    onSuccess: (project) => {
+  const createChannelMutation = useCreateChannel({
+    onSuccess: (channel) => {
       setOpen(false);
-      toast.success(`Project ${project.name} created!`);
+      toast.success(`Channel ${channel.name} created!`);
       form.reset();
     },
   });
@@ -57,25 +64,30 @@ export default function CreateProjectDialog() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     if (!user) return;
-    createProjectMutation.mutate({
+    createChannelMutation.mutate({
       name: data.name,
       createdBy: user.id,
+      projectId,
+      position: channelCount + 1,
     });
   }
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    form.setValue("name", e.target.value.toLowerCase().replace(/\s+/g, "-"));
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-5 w-5" /> New project
+        <Button variant="outline" disabled={disabled}>
+          Channel
+          <Plus className="ml-auto h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New project</DialogTitle>
-          <DialogDescription>
-            Add a new project to your account
-          </DialogDescription>
+          <DialogTitle>New channel</DialogTitle>
+          <DialogDescription>Add a new channel to project</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -91,8 +103,9 @@ export default function CreateProjectDialog() {
                     <Input
                       required
                       type="text"
-                      placeholder="project name"
+                      placeholder="channel-name"
                       {...field}
+                      onChange={handleNameChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -104,7 +117,7 @@ export default function CreateProjectDialog() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  disabled={createProjectMutation.isPending}
+                  disabled={createChannelMutation.isPending}
                 >
                   Cancel
                 </Button>
@@ -112,14 +125,14 @@ export default function CreateProjectDialog() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={createProjectMutation.isPending}
+                disabled={createChannelMutation.isPending}
               >
-                {createProjectMutation.isPending ? (
+                {createChannelMutation.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {createProjectMutation.isPending
+                {createChannelMutation.isPending
                   ? "Please wait..."
-                  : "Create project"}
+                  : "Create Channel"}
               </Button>
             </DialogFooter>
           </form>
