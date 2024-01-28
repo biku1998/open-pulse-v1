@@ -1,4 +1,9 @@
-import { Edit, Hash, Trash } from "lucide-react";
+import { AlertCircle, Edit, Hash, Trash } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../components/ui/alert";
 import { Button } from "../../../components/ui/button";
 import { toast } from "../../../lib/utils";
 import { useConfirmationDialog } from "../../../zustand-stores";
@@ -35,10 +40,22 @@ export default function ManageChannels(props: ManageChannelsProps) {
     openConfirmationDialog({
       title: "Delete channel",
       content: (
-        <p className="text-zinc-600">
-          Are you sure you want to delete <b>{name}</b> channel including all
-          it&apos;s feed?
-        </p>
+        <div className="flex flex-col gap-6">
+          <p>
+            Channel <b>{name}</b> will be deleted with all its events.
+          </p>
+
+          <Alert
+            variant="destructive"
+            className="animate-in slide-in-from-bottom-2"
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Warning</AlertTitle>
+            <AlertDescription>
+              This action is not reversible. Please be certain.
+            </AlertDescription>
+          </Alert>
+        </div>
       ),
       onConfirm: () => {
         deleteChannelMutation.mutate({
@@ -52,6 +69,8 @@ export default function ManageChannels(props: ManageChannelsProps) {
       },
       confirmButtonVariant: "destructive",
       confirmButtonText: "Delete",
+      twoFactorConfirm: true,
+      twoFactorConfirmText: name,
     });
   };
 

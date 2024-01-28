@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import _keyBy from "lodash/keyBy";
+import { Rss } from "lucide-react";
+import Nothing from "../../../components/nothing";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useConfirmationDialog } from "../../../zustand-stores";
 import EventLogCard from "../../components/event-log-card";
@@ -39,9 +41,7 @@ export default function SingleChannelPage() {
   const handleDeleteEvent = (id: number) => {
     openConfirmationDialog({
       title: "Delete event",
-      content: (
-        <p className="text-zinc-600">Are you sure you want to delete event?</p>
-      ),
+      content: <p>Are you sure you want to delete event?</p>,
       onConfirm: () => {
         deleteEventMutation.mutate({
           projectId,
@@ -89,6 +89,16 @@ export default function SingleChannelPage() {
             />
           ))
         : null}
+
+      {fetchChannelEventsQuery.data ? (
+        fetchChannelEventsQuery.data.length === 0 ? (
+          <Nothing
+            title="No feed found"
+            subText="Channel events will show up here"
+            icon={<Rss />}
+          />
+        ) : null
+      ) : null}
     </div>
   );
 }

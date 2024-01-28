@@ -1,5 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Trash } from "lucide-react";
+import { AlertCircle, Trash } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../components/ui/alert";
 import { Button } from "../../../components/ui/button";
 import { useFetchProjects } from "../../../home/queries";
 import { toast } from "../../../lib/utils";
@@ -44,13 +49,23 @@ export default function SettingPage() {
     openConfirmationDialog({
       title: "Delete project",
       content: (
-        <p className="text-zinc-600">
-          Are you sure you want to delete <b>{name}</b> project with all
-          it&apos;s data?
-          <br />
-          <br />
-          This action cannot be undone.
-        </p>
+        <div className="flex flex-col gap-6">
+          <p>
+            Project <b>{name}</b> project will be deleted with all of its
+            channels, insights and events.
+          </p>
+
+          <Alert
+            variant="destructive"
+            className="animate-in slide-in-from-bottom-2"
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Warning</AlertTitle>
+            <AlertDescription>
+              This action is not reversible. Please be certain.
+            </AlertDescription>
+          </Alert>
+        </div>
       ),
       onConfirm: () => {
         deleteProjectMutation.mutate(id);
@@ -61,6 +76,8 @@ export default function SettingPage() {
       },
       confirmButtonVariant: "destructive",
       confirmButtonText: "Delete",
+      twoFactorConfirm: true,
+      twoFactorConfirmText: name,
     });
   };
 
