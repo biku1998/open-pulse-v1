@@ -95,3 +95,51 @@ export const useDeleteProject = ({
     },
   });
 };
+
+const updateChannel = async ({
+  id,
+  updatedBy,
+  name,
+}: {
+  id: string;
+  updatedBy: string;
+  name: string;
+}) => {
+  const { error } = await supabase
+    .from("channels")
+    .update({ name, updated_by: updatedBy })
+    .eq("id", id);
+
+  if (error) throw new Error("Failed to update channel");
+};
+
+export const useUpdateChannel = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+} = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updatedBy,
+      name,
+      projectId,
+    }: {
+      id: string;
+      updatedBy: string;
+      name: string;
+      projectId: string;
+    }) => {
+      await updateChannel({ id, name, updatedBy });
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({
+        queryKey: channelKeys.list(projectId),
+      });
+      if (onSuccess) onSuccess();
+    },
+  });
+};

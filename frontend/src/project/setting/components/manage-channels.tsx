@@ -1,4 +1,4 @@
-import { AlertCircle, Edit, Hash, Trash } from "lucide-react";
+import { AlertCircle, Hash, Trash } from "lucide-react";
 import {
   Alert,
   AlertDescription,
@@ -10,6 +10,7 @@ import { useConfirmationDialog } from "../../../zustand-stores";
 import { useFetchChannels } from "../../channel/queries";
 import { useDeleteChannel } from "../mutations";
 import { useFetchChannelFeedCounts } from "../queries";
+import EditChannelDialog from "./edit-channel-dialog";
 
 type ManageChannelsProps = {
   projectId: string;
@@ -102,13 +103,11 @@ export default function ManageChannels(props: ManageChannelsProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="text-zinc-400 hover:text-zinc-500"
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
+              <EditChannelDialog
+                channelId={channel.id}
+                channelName={channel.name}
+                projectId={projectId}
+              />
               <Button
                 size="icon"
                 variant="ghost"

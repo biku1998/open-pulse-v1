@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus } from "lucide-react";
+import { Edit, Loader2 } from "lucide-react";
 import * as z from "zod";
 import { useGetUser } from "../../../auth/user-store";
 import { Button } from "../../../components/ui/button";
@@ -24,7 +24,7 @@ import {
 } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
 import { toast } from "../../../lib/utils";
-import { useCreateChannel } from "../mutations";
+import { useUpdateChannel } from "../mutations";
 
 const FormSchema = z.object({
   name: z
@@ -35,22 +35,23 @@ const FormSchema = z.object({
     .trim(),
 });
 
-type CreateChannelDialogProps = {
-  disabled: boolean;
+type EditChannelDialogProps = {
+  channelId: string;
+  channelName: string;
   projectId: string;
-  channelCount: number;
 };
-export default function CreateChannelDialog(props: CreateChannelDialogProps) {
-  const { disabled, projectId, channelCount } = props;
+
+export default function EditChannelDialog(props: EditChannelDialogProps) {
+  const { channelId, channelName, projectId } = props;
 
   const [open, setOpen] = React.useState(false);
 
   const user = useGetUser();
 
-  const createChannelMutation = useCreateChannel({
-    onSuccess: (channel) => {
+  const updateChannelMutation = useUpdateChannel({
+    onSuccess: () => {
       setOpen(false);
-      toast.success(`Channel ${channel.name} created`);
+      toast.success(`Channel updated`);
       form.reset();
     },
   });
@@ -58,17 +59,18 @@ export default function CreateChannelDialog(props: CreateChannelDialogProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: "",
+      name: channelName,
     },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     if (!user) return;
-    createChannelMutation.mutate({
+    console.log(data);
+    updateChannelMutation.mutate({
+      id: channelId,
       name: data.name,
-      createdBy: user.id,
+      updatedBy: user.id,
       projectId,
-      position: channelCount + 1,
     });
   }
 
@@ -79,15 +81,20 @@ export default function CreateChannelDialog(props: CreateChannelDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" disabled={disabled}>
-          Channel
-          <Plus className="ml-auto h-4 w-4" />
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-zinc-400 hover:text-zinc-500"
+        >
+          <Edit className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New channel</DialogTitle>
-          <DialogDescription>Add a new channel to project</DialogDescription>
+          <DialogTitle>Update channel</DialogTitle>
+          <DialogDescription>
+            Rename channel to make it more informative about the use-case
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -117,7 +124,7 @@ export default function CreateChannelDialog(props: CreateChannelDialogProps) {
                 <Button
                   variant="outline"
                   className="w-full"
-                  disabled={createChannelMutation.isPending}
+                  disabled={updateChannelMutation.isPending}
                 >
                   Cancel
                 </Button>
@@ -125,14 +132,14 @@ export default function CreateChannelDialog(props: CreateChannelDialogProps) {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={createChannelMutation.isPending}
+                disabled={updateChannelMutation.isPending}
               >
-                {createChannelMutation.isPending ? (
+                {updateChannelMutation.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {createChannelMutation.isPending
+                {updateChannelMutation.isPending
                   ? "Please wait..."
-                  : "Create channel"}
+                  : "Update channel"}
               </Button>
             </DialogFooter>
           </form>
