@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Home, RotateCw } from "lucide-react";
+import { Search, Home } from "lucide-react";
 import BgPattern from "../assets/bg-pattern.svg";
 import Header from "../components/header";
 import { Button } from "../components/ui/button";
@@ -34,10 +34,6 @@ export default function PageNotFound() {
           </p>
 
           <div className="flex items-center gap-4 mt-12">
-            <Button variant="outline" onClick={() => location.reload()}>
-              <RotateCw className="mr-2 h-4 w-4" /> Reload
-            </Button>
-
             <Link to="/">
               <Button>
                 <Home className="mr-2 h-4 w-4" /> Go Home

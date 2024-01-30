@@ -1,4 +1,5 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
+import AccountSettingPage from "./account-setting/pages";
 import AuthGuard from "./auth/components/auth-guard";
 import LoginPage from "./auth/pages/login";
 import RegisterPage from "./auth/pages/register";
@@ -45,6 +46,15 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <PageNotFound />,
+  },
+  {
+    path: "/setting",
+    element: (
+      <AuthGuard>
+        <AccountSettingPage />
+      </AuthGuard>
+    ),
+    errorElement: <RootErrorPage />,
   },
   {
     path: "/project/:projectId",

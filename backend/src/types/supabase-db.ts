@@ -92,6 +92,7 @@ export interface Database {
       event_tags: {
         Row: {
           created_at: string
+          created_by: string
           event_id: number
           id: number
           key: string
@@ -99,6 +100,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
+          created_by: string
           event_id: number
           id?: number
           key: string
@@ -106,12 +108,20 @@ export interface Database {
         }
         Update: {
           created_at?: string
+          created_by?: string
           event_id?: number
           id?: number
           key?: string
           value?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "event_tags_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "event_tags_event_id_fkey"
             columns: ["event_id"]
@@ -125,28 +135,34 @@ export interface Database {
         Row: {
           channel_id: string
           created_at: string
+          created_by: string
           description: string | null
           icon: string | null
           id: number
           name: string
+          project_id: string
           user_id: string | null
         }
         Insert: {
           channel_id: string
           created_at?: string
+          created_by: string
           description?: string | null
           icon?: string | null
           id?: number
           name: string
+          project_id: string
           user_id?: string | null
         }
         Update: {
           channel_id?: string
           created_at?: string
+          created_by?: string
           description?: string | null
           icon?: string | null
           id?: number
           name?: string
+          project_id?: string
           user_id?: string | null
         }
         Relationships: [
@@ -156,35 +172,62 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "channels"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
           }
         ]
       }
       insights: {
         Row: {
           created_at: string
+          created_by: string
           icon: string | null
           id: number
           name: string
           project_id: string
+          updated_at: string | null
           value: string
         }
         Insert: {
           created_at?: string
+          created_by: string
           icon?: string | null
           id?: number
           name: string
           project_id: string
+          updated_at?: string | null
           value: string
         }
         Update: {
           created_at?: string
+          created_by?: string
           icon?: string | null
           id?: number
           name?: string
           project_id?: string
+          updated_at?: string | null
           value?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "insights_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "insights_project_id_fkey"
             columns: ["project_id"]
@@ -291,6 +334,7 @@ export interface Database {
           created_by: string
           id: string
           is_active: boolean
+          name: string
           value: string
         }
         Insert: {
@@ -298,6 +342,7 @@ export interface Database {
           created_by: string
           id?: string
           is_active?: boolean
+          name?: string
           value: string
         }
         Update: {
@@ -305,6 +350,7 @@ export interface Database {
           created_by?: string
           id?: string
           is_active?: boolean
+          name?: string
           value?: string
         }
         Relationships: [

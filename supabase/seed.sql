@@ -105,9 +105,10 @@ values
   );
 
 insert into
-  public.tokens (value, created_by)
+  public.tokens (name, value, created_by)
 values
   (
+    'test-token',
     'TM1CmENnCbRNaQT38HegK5XTx3aOw4s5WVN1bx09FuflNWfADN',
     (
       select

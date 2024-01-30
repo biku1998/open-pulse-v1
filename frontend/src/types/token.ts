@@ -4,7 +4,7 @@ const TokenSchema = z.object({
   id: z.string().uuid(),
   isActive: z.boolean(),
   value: z.string(),
-  token: z.string(),
+  name: z.string(),
   createdBy: z.string().uuid(),
   createdAt: z.string(),
 });
