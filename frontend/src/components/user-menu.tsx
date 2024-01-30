@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LogOut, Settings } from "lucide-react";
 import { logout } from "../auth/api";
 import { useGetUser } from "../auth/user-store";
+import { useConfirmationDialog } from "../zustand-stores";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -16,9 +17,26 @@ export default function UserMenu() {
   const user = useGetUser();
   const navigate = useNavigate();
 
+  const { openConfirmationDialog, closeConfirmationDialog } =
+    useConfirmationDialog((store) => ({
+      openConfirmationDialog: store.openConfirmationDialog,
+      closeConfirmationDialog: store.closeConfirmationDialog,
+    }));
+
   const handleLogoutClick = () => {
-    logout();
-    navigate("/auth/login", { replace: true });
+    openConfirmationDialog({
+      title: "Logout",
+      content: <p>You will be logged out from open pulse</p>,
+      onConfirm: () => {
+        logout();
+        navigate("/auth/login", { replace: true });
+        closeConfirmationDialog();
+      },
+      onCancel: () => {
+        closeConfirmationDialog();
+      },
+      confirmButtonText: "Logout",
+    });
   };
 
   if (!user) return null;
@@ -35,12 +53,12 @@ export default function UserMenu() {
           <h6 className="text-sm text-zinc-600">My Account</h6>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link className="flex items-center" to="/setting">
+        <Link to="/setting">
+          <DropdownMenuItem className="flex items-center cursor-pointer">
             <Settings className="w-4 h-4 mr-2 text-zinc-500" />
             Settings
-          </Link>
-        </DropdownMenuItem>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem
           className="flex items-center cursor-pointer"
           onClick={handleLogoutClick}

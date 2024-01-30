@@ -71,11 +71,23 @@ const router = createBrowserRouter([
       },
       {
         path: "chart",
-        element: <div>Charts</div>,
+        element: (
+          <div className="w-full flex flex-col items-center mt-[200px]">
+            <h1 className="text-4xl font-extrabold text-zinc-500 animate-in slide-in-from-bottom-2">
+              Charts
+            </h1>
+          </div>
+        ),
       },
       {
         path: "insight",
-        element: <div>Insights</div>,
+        element: (
+          <div className="w-full flex flex-col items-center mt-[200px]">
+            <h1 className="text-4xl font-extrabold text-zinc-500 animate-in slide-in-from-bottom-2">
+              Insights
+            </h1>
+          </div>
+        ),
       },
       {
         path: "setting",

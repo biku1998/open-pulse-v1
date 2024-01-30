@@ -7,6 +7,8 @@ const TokenSchema = z.object({
   name: z.string(),
   createdBy: z.string().uuid(),
   createdAt: z.string(),
+  updatedAt: z.string().nullable(),
+  updatedBy: z.string().uuid().nullable(),
 });
 
 export type Token = z.infer<typeof TokenSchema>;
