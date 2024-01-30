@@ -9,7 +9,8 @@ const getTokens = async (): Promise<
 > => {
   const { data, error } = await supabase
     .from("tokens")
-    .select("id, name, value, is_active");
+    .select("id, name, value, is_active")
+    .order("created_at", { ascending: false });
   if (error) throw new Error("Failed to get tokens");
 
   return convertToCamelCase<Omit<Token, "createdBy" | "createdAt">[]>(data);

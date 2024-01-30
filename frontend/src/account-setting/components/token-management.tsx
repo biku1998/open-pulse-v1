@@ -1,13 +1,34 @@
 import * as React from "react";
 import _omit from "lodash/omit";
 import { Settings, Eye, EyeOff, Copy } from "lucide-react";
+import { useGetUser } from "../../auth/user-store";
 import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
 import { cn, toast } from "../../lib/utils";
+import { useToggleToken } from "../mutations";
 import { useFetchTokens } from "../queries";
 import CreateTokenDialog from "./create-token-dialog";
 
 export default function TokenManagement() {
+  const user = useGetUser();
+
   const fetchTokensQuery = useFetchTokens();
+
+  const toggleTokenMutation = useToggleToken({
+    onSuccess: ({ id, isActive }) => {
+      if (!fetchTokensQuery.data) return;
+      const tokenName =
+        fetchTokensQuery.data.find((token) => token.id === id)?.name ?? "";
+      if (isActive) {
+        toast.success(`Token ${tokenName} is now active`);
+        return;
+      }
+      toast(
+        `Token ${tokenName} is now in-active. It can no longer be used to publish events.`,
+      );
+    },
+    onError: (error) => toast.error(error.message),
+  });
 
   const [visibleKeyIds, setVisibleKeyIds] = React.useState<{
     [k: string]: "0";
@@ -21,9 +42,14 @@ export default function TokenManagement() {
     }
   };
 
-  const handleCopy = (value: string) => {
+  const handleCopy = (name: string, value: string) => {
     navigator.clipboard.writeText(value);
-    toast("Token copied to clipboard");
+    toast(`Token ${name} copied to clipboard`);
+  };
+
+  const handleCheckedChange = (checked: boolean, id: string) => {
+    if (!user) return;
+    toggleTokenMutation.mutate({ id, isActive: checked, updatedBy: user.id });
   };
 
   return (
@@ -43,44 +69,53 @@ export default function TokenManagement() {
               <div className="flex flex-col gap-[6px]" key={token.id}>
                 <span className="text-sm text-zinc-500">{token.name}</span>
 
-                <div className="py-2 px-4 flex items-center justify-between rounded-lg border border-zinc-200">
-                  <span
-                    className={cn(
-                      "text-sm text-zinc-600",
-                      visibleKeyIds[token.id] ? "" : "blur-sm",
-                    )}
-                  >
-                    {token.value}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-zinc-400 hover:text-zinc-500"
-                    >
-                      <Settings className="w-4 h-4 " />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-zinc-400 hover:text-zinc-500"
-                      onClick={() => toggleVisibility(token.id)}
-                    >
-                      {visibleKeyIds[token.id] ? (
-                        <Eye className="w-4 h-4 " />
-                      ) : (
-                        <EyeOff className="w-4 h-4 " />
+                <div className="flex items-center gap-5">
+                  <div className="py-2 px-4 flex items-center justify-between rounded-lg border border-zinc-200 w-full">
+                    <span
+                      className={cn(
+                        "text-sm text-zinc-600 max-w-[290px] truncate",
+                        visibleKeyIds[token.id] ? "" : "blur-sm",
                       )}
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-zinc-400 hover:text-zinc-500"
-                      onClick={() => handleCopy(token.value)}
                     >
-                      <Copy className="w-4 h-4 " />
-                    </Button>
+                      {token.value}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-zinc-400 hover:text-zinc-500"
+                      >
+                        <Settings className="w-4 h-4 " />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-zinc-400 hover:text-zinc-500"
+                        onClick={() => toggleVisibility(token.id)}
+                      >
+                        {visibleKeyIds[token.id] ? (
+                          <Eye className="w-4 h-4 " />
+                        ) : (
+                          <EyeOff className="w-4 h-4 " />
+                        )}
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-zinc-400 hover:text-zinc-500"
+                        onClick={() => handleCopy(token.name, token.value)}
+                      >
+                        <Copy className="w-4 h-4 " />
+                      </Button>
+                    </div>
                   </div>
+
+                  <Switch
+                    checked={token.isActive}
+                    onCheckedChange={(checked) =>
+                      handleCheckedChange(checked, token.id)
+                    }
+                  />
                 </div>
               </div>
             ))

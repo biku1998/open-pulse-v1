@@ -80,8 +80,18 @@ export default function CreateTokenDialog() {
     form.setValue("value", generateAlphanumericKey(30));
   };
 
+  const handleOnOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      form.reset({
+        name: "",
+        value: "",
+      });
+    }
+    setOpen(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <Plus className="mr-2 w-4 h-4" /> Token

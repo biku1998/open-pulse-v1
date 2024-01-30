@@ -67,3 +67,7 @@ export const useLogin = ({
     onSuccess,
     onError,
   });
+
+export const logout = () => {
+  supabase.auth.signOut();
+};
