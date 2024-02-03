@@ -106,8 +106,6 @@ export default function EventLogFilter() {
     setSearchParams(searchParams);
   };
 
-  const allTagsEmpty = filter.tags.every((tag) => tag.label === "");
-
   const appliedFilterCount =
     filter.tags.filter((tag) => tag.label !== "" && tag.value !== "").length +
     (filter.userId !== "" ? 1 : 0);

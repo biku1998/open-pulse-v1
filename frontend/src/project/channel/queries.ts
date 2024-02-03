@@ -55,9 +55,9 @@ export const useFetchChannelEvents = ({
   useQuery({
     queryFn: async () => {
       const events = await fetchChannelEvents({ projectId, channelId });
-      const eventTags = await fetchTagsByEventIds(
-        events.map((event) => event.id),
-      );
+      const eventTags = await fetchTagsByEventIds({
+        eventIds: events.map((event) => event.id),
+      });
 
       return events.map((event) => ({
         event,
