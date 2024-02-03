@@ -10,8 +10,6 @@ import { useFetchEvents } from "../queries";
 export default function FeedPage() {
   const { projectId = "" } = useParams();
 
-  // const [selectedEvent, setSelectedEvent] = React.useState<string | null>(null);
-
   const { openConfirmationDialog, closeConfirmationDialog } =
     useConfirmationDialog((store) => ({
       openConfirmationDialog: store.openConfirmationDialog,
@@ -40,10 +38,6 @@ export default function FeedPage() {
     });
   };
 
-  const handleMaximizeEvent = (id: number) => {
-    console.log(id);
-  };
-
   return (
     <div className="flex flex-col items-center gap-5 py-6">
       {fetchEventsQuery.isPending ? (
@@ -56,14 +50,14 @@ export default function FeedPage() {
       ) : null}
 
       {fetchEventsQuery.data
-        ? fetchEventsQuery.data.map(({ event, channel }) => (
+        ? fetchEventsQuery.data.map(({ event, channel, tags }) => (
             <EventLogCard
               key={event.id}
               event={event}
               channel={channel}
               projectId={projectId}
               handleDeleteEvent={() => handleDeleteEvent(event.id)}
-              handleMaximizeEvent={() => handleMaximizeEvent(event.id)}
+              tags={tags}
             />
           ))
         : null}

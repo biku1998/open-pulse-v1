@@ -3,6 +3,7 @@ import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
 import { Channel } from "../../types/channel";
 import { Event } from "../../types/event";
+import { fetchTagsByEventIds } from "../queries";
 import { channelKeys } from "./query-keys";
 
 const fetchChannels = async (
@@ -52,6 +53,16 @@ export const useFetchChannelEvents = ({
   channelId: string;
 }) =>
   useQuery({
-    queryFn: () => fetchChannelEvents({ projectId, channelId }),
+    queryFn: async () => {
+      const events = await fetchChannelEvents({ projectId, channelId });
+      const eventTags = await fetchTagsByEventIds(
+        events.map((event) => event.id),
+      );
+
+      return events.map((event) => ({
+        event,
+        tags: eventTags.filter((tag) => tag.eventId === event.id),
+      }));
+    },
     queryKey: channelKeys.events(projectId, channelId),
   });

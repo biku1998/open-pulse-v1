@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Dot, Hash, Maximize2, Trash } from "lucide-react";
+import { Dot, Hash, Trash, User } from "lucide-react";
+import Tag from "../../components/tag";
 import { Button } from "../../components/ui/button";
 import {
   Tooltip,
@@ -10,31 +11,31 @@ import {
 import dayjs from "../../lib/dayjs";
 import { Channel } from "../../types/channel";
 import { Event } from "../../types/event";
+import { EventTag } from "../../types/event-tag";
 
 type EventLogCardProps = {
-  event: Pick<Event, "id" | "name" | "description" | "createdAt" | "icon">;
+  event: Pick<
+    Event,
+    "id" | "name" | "description" | "createdAt" | "icon" | "userId"
+  >;
   channel: Pick<Channel, "name" | "id">;
+  tags: Pick<EventTag, "id" | "key" | "value" | "eventId">[];
   projectId: string;
   handleDeleteEvent: () => void;
-  handleMaximizeEvent: () => void;
 };
 
 export default function EventLogCard(props: EventLogCardProps) {
-  const { event, channel, projectId, handleDeleteEvent, handleMaximizeEvent } =
-    props;
+  const { event, channel, projectId, handleDeleteEvent, tags } = props;
 
   return (
     <div className="relative group p-5 flex gap-5 border border-zinc-100 rounded-[8px] hover:border-zinc-200 w-[560px] animate-in slide-in-from-bottom-2">
       <div className="w-12 h-12 px-2 py-[10px] bg-green-50 flex items-center justify-center rounded-[8px]">
-        <span>{event.icon}</span>
+        <span className="text-lg">{event.icon}</span>
       </div>
 
       <div className="flex flex-col w-full">
         <h3 className="font-semibold text-zinc-950">{event.name}</h3>
         <div className="items-center hidden group-hover:flex absolute top-5 right-5 animate-in slide-in-from-bottom-2 duration-300">
-          <Button variant="ghost" size="icon" onClick={handleMaximizeEvent}>
-            <Maximize2 className="h-4 w-4 text-zinc-500" />
-          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -68,7 +69,7 @@ export default function EventLogCard(props: EventLogCardProps) {
           )
         ) : null}
 
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex items-center gap-2 mt-2 mb-3">
           <Link
             to={`/project/${projectId}/channel/${channel.id}`}
             className="text-zinc-500 flex items-center text-sm  group-hover:text-primary"
@@ -84,6 +85,24 @@ export default function EventLogCard(props: EventLogCardProps) {
             </span>
           </div>
         </div>
+        {event.userId ? (
+          <Tag
+            label="user-id"
+            value={event.userId}
+            className="mb-4"
+            icon={<User className="w-4 h-4 text-zinc-400" />}
+          />
+        ) : null}
+        {tags.length > 0 ? (
+          <div className="flex flex-col gap-1.5">
+            <h4 className="text-xs text-zinc-500 font-medium">Tags</h4>
+            <div className="flex items-center gap-2 flex-wrap">
+              {tags.map((tag) => (
+                <Tag key={tag.id} label={tag.key} value={tag.value} />
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

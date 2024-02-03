@@ -57,10 +57,6 @@ export default function SingleChannelPage() {
     });
   };
 
-  const handleMaximizeEvent = (id: number) => {
-    console.log(id);
-  };
-
   const channelInfoById = _keyBy(
     fetchChannelsQuery.data ? fetchChannelsQuery.data : {},
     "id",
@@ -78,14 +74,14 @@ export default function SingleChannelPage() {
       ) : null}
 
       {fetchChannelEventsQuery.data && fetchChannelsQuery.data
-        ? fetchChannelEventsQuery.data.map((event) => (
+        ? fetchChannelEventsQuery.data.map(({ event, tags }) => (
             <EventLogCard
               key={event.id}
               event={event}
               channel={channelInfoById[event.channelId]}
               projectId={projectId}
               handleDeleteEvent={() => handleDeleteEvent(event.id)}
-              handleMaximizeEvent={() => handleMaximizeEvent(event.id)}
+              tags={tags}
             />
           ))
         : null}
