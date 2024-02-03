@@ -60,9 +60,9 @@ export default function FeedPage() {
           onClick={handleEventLogCardCollapseToggle}
         >
           {isEventLogCardExpanded ? (
-            <img src={CollapseIcon} alt="collapse" />
+            <img src={ExpandIcon} alt="expand-icon" />
           ) : (
-            <img src={ExpandIcon} alt="expand" />
+            <img src={CollapseIcon} alt="collapse-icon" />
           )}
         </Button>
       </ProjectHeader>

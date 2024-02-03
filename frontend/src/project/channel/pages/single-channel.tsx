@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import _keyBy from "lodash/keyBy";
 import { Rss } from "lucide-react";
@@ -12,6 +12,8 @@ import { channelKeys } from "../query-keys";
 
 export default function SingleChannelPage() {
   const { projectId = "", channelId = "" } = useParams();
+  const [searchParams] = useSearchParams();
+
   const queryClient = useQueryClient();
 
   const { openConfirmationDialog, closeConfirmationDialog } =
@@ -62,6 +64,8 @@ export default function SingleChannelPage() {
     "id",
   );
 
+  const isEventLogCardExpanded = searchParams.get("expand") === "true";
+
   return (
     <div className="flex flex-col items-center gap-5 py-6">
       {isLoading ? (
@@ -82,7 +86,7 @@ export default function SingleChannelPage() {
               projectId={projectId}
               handleDeleteEvent={() => handleDeleteEvent(event.id)}
               tags={tags}
-              isExpanded={true}
+              isExpanded={isEventLogCardExpanded}
             />
           ))
         : null}
