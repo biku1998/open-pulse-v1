@@ -7,12 +7,24 @@ import { Event } from "../types/event";
 import { EventTag } from "../types/event-tag";
 import { eventKeys } from "./query-keys";
 
-const fetchEvents = async (projectId: string): Promise<Event[]> => {
-  const { data, error } = await supabase
+const fetchEvents = async ({
+  projectId,
+  userId,
+}: {
+  projectId: string;
+  userId: string | null;
+}): Promise<Event[]> => {
+  const query = supabase
     .from("events")
     .select("*")
     .eq("project_id", projectId)
     .order("created_at", { ascending: false });
+
+  if (userId) {
+    query.eq("user_id", userId);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error("Failed to fetch events");
 
@@ -32,13 +44,33 @@ const fetchChannelNamesById = async (
   return data;
 };
 
-export const fetchTagsByEventIds = async (
-  eventIds: number[],
-): Promise<Pick<EventTag, "id" | "key" | "value" | "eventId">[]> => {
-  const { data, error } = await supabase
+export const fetchTagsByEventIds = async ({
+  eventIds,
+  tags = [],
+}: {
+  eventIds: number[];
+  tags?: Array<{
+    key: string;
+    value: string;
+  }>;
+}): Promise<Pick<EventTag, "id" | "key" | "value" | "eventId">[]> => {
+  const query = supabase
     .from("event_tags")
     .select("id, key, value, event_id")
     .in("event_id", eventIds);
+
+  if (tags.length !== 0) {
+    query.in(
+      "key",
+      tags.map((tag) => tag.key),
+    );
+    query.in(
+      "value",
+      tags.map((tag) => tag.value),
+    );
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error("Failed to fetch tags");
 
@@ -47,29 +79,55 @@ export const fetchTagsByEventIds = async (
   >(data);
 };
 
-export const useFetchEvents = (projectId: string) =>
+export const useFetchEvents = ({
+  userId,
+  tags,
+  projectId,
+}: {
+  projectId: string;
+  userId?: string;
+  tags?: Array<{
+    key: string;
+    value: string;
+  }>;
+}) =>
   useQuery({
-    queryKey: eventKeys.list(projectId),
+    queryKey: eventKeys.list(
+      projectId,
+      JSON.stringify({
+        userId,
+        tags,
+      }),
+    ),
     queryFn: async () => {
-      const events = await fetchEvents(projectId);
+      const events = await fetchEvents({
+        projectId,
+        userId: userId || null,
+      });
+
       const channelsInfo = await fetchChannelNamesById(
         events.map((event) => event.channelId),
       );
+
       const channelsInfoById = _keyBy(channelsInfo, "id");
 
-      const eventTags = await fetchTagsByEventIds(
-        events.map((event) => event.id),
-      );
+      const eventTags = await fetchTagsByEventIds({
+        eventIds: events.map((event) => event.id),
+        tags,
+      });
 
-      console.log(eventTags);
+      // extract unique event ids from eventTags
+      const eventIds = Array.from(new Set(eventTags.map((tag) => tag.eventId)));
 
-      return events.map((event) => ({
-        event,
-        channel: {
-          id: event.channelId,
-          name: channelsInfoById[event.channelId].name,
-        },
-        tags: eventTags.filter((tag) => tag.eventId === event.id),
-      }));
+      return events
+        .filter((event) => eventIds.includes(event.id))
+        .map((event) => ({
+          event,
+          channel: {
+            id: event.channelId,
+            name: channelsInfoById[event.channelId].name,
+          },
+          tags: eventTags.filter((tag) => tag.eventId === event.id),
+        }));
     },
   });

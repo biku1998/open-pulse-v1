@@ -1,13 +1,15 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Rss } from "lucide-react";
 import CollapseIcon from "../../assets/collapse-icon.svg";
 import ExpandIcon from "../../assets/expand-icon.svg";
 import Nothing from "../../components/nothing";
+import Tag from "../../components/tag";
 import { Button } from "../../components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import { useConfirmationDialog } from "../../zustand-stores";
 import EventLogCard from "../components/event-log-card";
+import EventLogFilter from "../components/event-log-filter";
 import ProjectHeader from "../components/project-header";
 import { useDeleteEvent } from "../mutations";
 import { useFetchEvents } from "../queries";
@@ -17,6 +19,7 @@ export default function FeedPage() {
     React.useState(false);
 
   const { projectId = "" } = useParams();
+  const [searchParams] = useSearchParams();
 
   const { openConfirmationDialog, closeConfirmationDialog } =
     useConfirmationDialog((store) => ({
@@ -24,7 +27,18 @@ export default function FeedPage() {
       closeConfirmationDialog: store.closeConfirmationDialog,
     }));
 
-  const fetchEventsQuery = useFetchEvents(projectId);
+  const filters = searchParams.getAll("filter");
+
+  const fetchEventsQuery = useFetchEvents({
+    projectId,
+    userId: filters.filter((f) => f.includes("userId"))[0]?.split(":eq:")[1],
+    tags: filters
+      .filter((f) => !f.includes("userId"))
+      .map((f) => {
+        const [key, value] = f.split(":eq:");
+        return { key, value };
+      }),
+  });
   const deleteEventMutation = useDeleteEvent();
 
   const handleDeleteEvent = (id: number) => {
@@ -53,6 +67,16 @@ export default function FeedPage() {
   return (
     <>
       <ProjectHeader>
+        {fetchEventsQuery.data ? (
+          fetchEventsQuery.data.length > 0 ? (
+            <Tag
+              label="Total events"
+              value={fetchEventsQuery.data.length.toString()}
+              className="mr-4 animate-in slide-in-from-bottom-2"
+            />
+          ) : null
+        ) : null}
+        <EventLogFilter />
         <Button
           size="icon"
           className="mr-4"
