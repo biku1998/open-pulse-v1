@@ -82,6 +82,7 @@ export default function SingleChannelPage() {
               projectId={projectId}
               handleDeleteEvent={() => handleDeleteEvent(event.id)}
               tags={tags}
+              isExpanded={true}
             />
           ))
         : null}
