@@ -22,10 +22,12 @@ type EventLogCardProps = {
   tags: Pick<EventTag, "id" | "key" | "value" | "eventId">[];
   projectId: string;
   handleDeleteEvent: () => void;
+  isExpanded: boolean;
 };
 
 export default function EventLogCard(props: EventLogCardProps) {
-  const { event, channel, projectId, handleDeleteEvent, tags } = props;
+  const { event, channel, projectId, handleDeleteEvent, tags, isExpanded } =
+    props;
 
   return (
     <div className="relative group p-5 flex gap-5 border border-zinc-100 rounded-[8px] hover:border-zinc-200 w-[560px] animate-in slide-in-from-bottom-2">
@@ -85,16 +87,16 @@ export default function EventLogCard(props: EventLogCardProps) {
             </span>
           </div>
         </div>
-        {event.userId ? (
+        {event.userId && isExpanded ? (
           <Tag
             label="user-id"
             value={event.userId}
-            className="mb-4"
+            className="mb-4 animate-in slide-in-from-bottom-2"
             icon={<User className="w-4 h-4 text-zinc-400" />}
           />
         ) : null}
-        {tags.length > 0 ? (
-          <div className="flex flex-col gap-1.5">
+        {tags.length > 0 && isExpanded ? (
+          <div className="flex flex-col gap-1.5 animate-in slide-in-from-bottom-2">
             <h4 className="text-xs text-zinc-500 font-medium">Tags</h4>
             <div className="flex items-center gap-2 flex-wrap">
               {tags.map((tag) => (
