@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster, toast } from "sonner";
 import AuthLoader from "./auth/components/auth-loader";
 import ConfirmationDialog from "./components/confirmation-dialog";
+import DisableSmallScreen from "./components/disable-small-screen";
 import "./index.css";
 import router from "./router";
 
@@ -24,13 +25,15 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AuthLoader>
-        <Toaster richColors />
-        <ConfirmationDialog />
-        <RouterProvider router={router} />
-      </AuthLoader>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <DisableSmallScreen>
+      <QueryClientProvider client={queryClient}>
+        <AuthLoader>
+          <Toaster richColors />
+          <ConfirmationDialog />
+          <RouterProvider router={router} />
+        </AuthLoader>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </DisableSmallScreen>
   </React.StrictMode>,
 );
