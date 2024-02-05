@@ -15,7 +15,7 @@ export class InsightsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async createInsight(createInsightDto: CreateInsightDto, ownerUserId: string) {
-    const { projectId, name, value } = createInsightDto;
+    const { projectId, name, value, icon } = createInsightDto;
 
     this.logger.log(
       `${this.createInsight.name} called with projectId [${projectId}], name [${name}], value [${value}], ownerUserId [${ownerUserId}]`,
@@ -34,15 +34,15 @@ export class InsightsService {
 
       // check if insight exists
       const insights = await this.databaseService.sql<
-        Pick<Database['public']['Tables']['insights']['Row'], 'id'>[]
+        Pick<Database['public']['Tables']['insights']['Row'], 'id' | 'icon'>[]
       >`
-  SELECT id FROM insights WHERE project_id = ${projectId} AND name = ${name} AND created_by = ${ownerUserId}
+  SELECT id, icon FROM insights WHERE project_id = ${projectId} AND name = ${name} AND created_by = ${ownerUserId}
   `;
       if (insights.length > 0) {
         // update the insight value
         await this.databaseService.sql`
       UPDATE insights
-      SET value = ${value}
+      SET value = ${value}, icon = ${icon || insights[0].icon}
       WHERE id = ${insights[0].id}
       `;
         return;
@@ -50,8 +50,8 @@ export class InsightsService {
 
       // create the insight
       await this.databaseService.sql`
-      INSERT INTO insights (project_id, name, value, created_by)
-      VALUES (${projectId}, ${name}, ${value}, ${ownerUserId})
+      INSERT INTO insights (project_id, name, value, created_by, icon)
+      VALUES (${projectId}, ${name}, ${value}, ${ownerUserId}, ${icon || null})
       `;
     } catch (error) {
       if (error instanceof NotFoundException) {

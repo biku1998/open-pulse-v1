@@ -8,7 +8,7 @@ import RootLayout from "./components/root-layout";
 import HomePage from "./home/pages";
 import PageNotFound from "./pages/404";
 import ChannelPage from "./project/channel/pages";
-import SingleChannelPage from "./project/channel/pages/single-channel";
+import InsightPage from "./project/insight/pages";
 import ProjectPage from "./project/pages";
 import FeedPage from "./project/pages/feed";
 import SettingPage from "./project/setting/pages";
@@ -81,13 +81,7 @@ const router = createBrowserRouter([
       },
       {
         path: "insight",
-        element: (
-          <div className="w-full flex flex-col items-center mt-[200px]">
-            <h1 className="text-4xl font-extrabold text-zinc-500 animate-in slide-in-from-bottom-2">
-              Insights
-            </h1>
-          </div>
-        ),
+        element: <InsightPage />,
       },
       {
         path: "setting",
@@ -96,12 +90,10 @@ const router = createBrowserRouter([
       {
         path: "channel",
         element: <ChannelPage />,
-        children: [
-          {
-            path: ":channelId",
-            element: <SingleChannelPage />,
-          },
-        ],
+      },
+      {
+        path: "channel/:channelId",
+        element: <ChannelPage />,
       },
     ],
   },

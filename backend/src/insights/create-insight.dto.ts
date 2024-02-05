@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateInsightDto {
   @IsNotEmpty()
@@ -12,4 +12,8 @@ export class CreateInsightDto {
   @IsNotEmpty()
   @IsString()
   readonly value: string;
+
+  @IsOptional()
+  @IsString()
+  readonly icon?: string;
 }

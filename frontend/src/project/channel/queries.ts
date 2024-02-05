@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
 import { Channel } from "../../types/channel";
-import { Event } from "../../types/event";
-import { fetchTagsByEventIds } from "../queries";
+import { fetchEvents, fetchTagsByEventIds } from "../queries";
 import { channelKeys } from "./query-keys";
 
 const fetchChannels = async (
@@ -27,42 +26,46 @@ export const useFetchChannels = (projectId: string) =>
     queryKey: channelKeys.list(projectId),
   });
 
-const fetchChannelEvents = async ({
-  projectId,
-  channelId,
-}: {
-  projectId: string;
-  channelId: string;
-}) => {
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .match({ channel_id: channelId, project_id: projectId });
-
-  if (error) throw new Error("Failed to fetch channel events");
-
-  return convertToCamelCase<Event[]>(data);
-};
-
 export const useFetchChannelEvents = ({
   projectId,
-  channelId,
+  channelId = "",
+  userId,
+  tags,
 }: {
   projectId: string;
-  channelId: string;
+  channelId?: string;
+  userId?: string;
+  tags?: Array<{
+    key: string;
+    value: string;
+  }>;
 }) =>
   useQuery({
     queryFn: async () => {
-      const events = await fetchChannelEvents({ projectId, channelId });
+      const events = await fetchEvents({ projectId, channelId, userId });
+
       const eventTags = await fetchTagsByEventIds({
         eventIds: events.map((event) => event.id),
+        tags,
       });
 
-      return events.map((event) => ({
-        event,
-        tags: eventTags.filter((tag) => tag.eventId === event.id),
-      }));
+      // extract unique event ids from eventTags
+      const eventIds = Array.from(new Set(eventTags.map((tag) => tag.eventId)));
+
+      return events
+        .filter((event) => eventIds.includes(event.id))
+        .map((event) => ({
+          event,
+          tags: eventTags.filter((tag) => tag.eventId === event.id),
+        }));
     },
-    queryKey: channelKeys.events(projectId, channelId),
+    queryKey: channelKeys.eventList({
+      id: channelId,
+      projectId,
+      filters: JSON.stringify({
+        userId,
+        tags,
+      }),
+    }),
+    enabled: Boolean(channelId),
   });

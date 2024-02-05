@@ -5,7 +5,6 @@ const EventSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   icon: z.string().nullable(),
-  iconUrl: z.string().nullable(),
   userId: z.string().uuid().nullable(),
   channelId: z.string().uuid(),
   createdBy: z.string().uuid(),

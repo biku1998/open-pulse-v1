@@ -66,7 +66,7 @@ export default function ProjectHeader(props: ProjectHeaderProps) {
                 variant="ghost"
                 role="combobox"
                 aria-expanded={selectProjectPopoverOpen}
-                className="min-w-[200px] justify-between text-zinc-600 animate-in slide-in-from-bottom-2"
+                className="min-w-[200px] justify-between text-zinc-600 animate-in fade-in"
               >
                 {projectId
                   ? fetchProjectsQuery.data.find(
