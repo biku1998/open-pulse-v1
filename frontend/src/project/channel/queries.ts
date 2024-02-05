@@ -28,12 +28,12 @@ export const useFetchChannels = (projectId: string) =>
 
 export const useFetchChannelEvents = ({
   projectId,
-  channelId,
+  channelId = "",
   userId,
   tags,
 }: {
   projectId: string;
-  channelId: string;
+  channelId?: string;
   userId?: string;
   tags?: Array<{
     key: string;
@@ -67,4 +67,5 @@ export const useFetchChannelEvents = ({
         tags,
       }),
     }),
+    enabled: Boolean(channelId),
   });
