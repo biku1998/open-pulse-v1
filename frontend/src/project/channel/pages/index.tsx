@@ -10,6 +10,7 @@ import {
   NAVBAR_WIDTH,
 } from "../../../constants";
 import { cn } from "../../../lib/utils";
+import EventLogFilter from "../../components/event-log-filter";
 import ProjectHeader from "../../components/project-header";
 import CreateChannelDialog from "../components/create-channel-dialog";
 import { useFetchChannels } from "../queries";
@@ -36,6 +37,7 @@ export default function ChannelPage() {
   return (
     <>
       <ProjectHeader>
+        <EventLogFilter />
         <Button
           size="icon"
           className="mr-4"

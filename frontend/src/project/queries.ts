@@ -7,12 +7,14 @@ import { Event } from "../types/event";
 import { EventTag } from "../types/event-tag";
 import { eventKeys } from "./query-keys";
 
-const fetchEvents = async ({
+export const fetchEvents = async ({
   projectId,
   userId,
+  channelId,
 }: {
   projectId: string;
-  userId: string | null;
+  channelId?: string;
+  userId?: string;
 }): Promise<Event[]> => {
   const query = supabase
     .from("events")
@@ -22,6 +24,10 @@ const fetchEvents = async ({
 
   if (userId) {
     query.eq("user_id", userId);
+  }
+
+  if (channelId) {
+    query.eq("channel_id", channelId);
   }
 
   const { data, error } = await query;
@@ -102,7 +108,7 @@ export const useFetchEvents = ({
     queryFn: async () => {
       const events = await fetchEvents({
         projectId,
-        userId: userId || null,
+        userId,
       });
 
       const channelsInfo = await fetchChannelNamesById(

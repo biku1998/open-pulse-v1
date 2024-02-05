@@ -16,6 +16,8 @@ export default function SingleChannelPage() {
 
   const queryClient = useQueryClient();
 
+  const filters = searchParams.getAll("filter");
+
   const { openConfirmationDialog, closeConfirmationDialog } =
     useConfirmationDialog((store) => ({
       openConfirmationDialog: store.openConfirmationDialog,
@@ -25,12 +27,18 @@ export default function SingleChannelPage() {
   const fetchChannelEventsQuery = useFetchChannelEvents({
     projectId,
     channelId,
+    tags: filters
+      .filter((f) => !f.includes("userId"))
+      .map((f) => {
+        const [key, value] = f.split(":eq:");
+        return { key, value };
+      }),
   });
 
   const deleteEventMutation = useDeleteEvent({
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: channelKeys.events(projectId, channelId),
+        queryKey: channelKeys.detail({ projectId, id: channelId }),
       });
     },
   });
