@@ -45,7 +45,7 @@ export default function ProjectHeader(props: ProjectHeaderProps) {
         paddingLeft: `${NAVBAR_WIDTH}px`,
       }}
     >
-      <div className="flex items-center gap-2 border-b border-solid border-slate-200 w-full h-full pl-4 pr-10 border">
+      <div className="flex items-center gap-2 border-b border-solid border-slate-200 w-full h-full pl-4 pr-10">
         <Link to="/">
           <Button variant="ghost" size="sm" className="text-zinc-500">
             Projects

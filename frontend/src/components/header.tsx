@@ -1,8 +1,7 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
-import Logo from "../assets/logo.png";
 import { HEADER_HEIGHT } from "../constants";
 import { cn } from "../lib/utils";
+import Logo from "./logo";
 import UserMenu from "./user-menu";
 
 type HeaderProps = {
@@ -19,16 +18,7 @@ export default function Header(props: HeaderProps) {
         height: `${HEADER_HEIGHT}px`,
       }}
     >
-      <Link to="/">
-        <div className="mr-4 flex items-center justify-center px-1.5 py-1 hover:cursor-pointer hover:bg-slate-50 rounded-full">
-          <img
-            src={Logo}
-            alt="Open pulse logo"
-            loading="eager"
-            className="h-[40px] w-[40px]"
-          />
-        </div>
-      </Link>
+      <Logo />
       <div className={cn(className, "w-full")}>{children}</div>
       <UserMenu />
     </header>
