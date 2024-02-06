@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, GripHorizontal } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import dayjs from "../../../lib/dayjs";
 import { cn } from "../../../lib/utils";
@@ -7,7 +7,7 @@ import { Insight } from "../../../types/insight";
 type InsightCardProps = {
   insight: Insight;
   fullWidth: boolean;
-  handleInsightDelete: (id: number) => void;
+  handleInsightDelete: (args: { id: number; name: string }) => void;
   editModeEnabled: boolean;
 };
 
@@ -20,7 +20,7 @@ export default function InsightCard(props: InsightCardProps) {
   } = props;
 
   const handleDeleteInsightClick = () => {
-    handleInsightDelete(id);
+    handleInsightDelete({ id, name });
   };
 
   return (
@@ -30,6 +30,16 @@ export default function InsightCard(props: InsightCardProps) {
         fullWidth ? "w-full" : "",
       )}
     >
+      {editModeEnabled ? (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-zinc-400 h-6 hover:cursor-grab absolute top-1 mx-auto left-0 right-0 animate-in slide-in-from-bottom-2"
+        >
+          <GripHorizontal className="h-4 w-4" />
+        </Button>
+      ) : null}
+
       <div className="flex justify-between items-center">
         <h3 className="text-2xl font-bold text-zinc-700 group-hover:text-zinc-800">
           {value}

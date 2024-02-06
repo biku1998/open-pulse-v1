@@ -196,6 +196,7 @@ export interface Database {
           icon: string | null
           id: number
           name: string
+          position: number
           project_id: string
           updated_at: string | null
           value: string
@@ -206,6 +207,7 @@ export interface Database {
           icon?: string | null
           id?: number
           name: string
+          position?: number
           project_id: string
           updated_at?: string | null
           value: string
@@ -216,6 +218,7 @@ export interface Database {
           icon?: string | null
           id?: number
           name?: string
+          position?: number
           project_id?: string
           updated_at?: string | null
           value?: string
@@ -244,6 +247,8 @@ export interface Database {
           id: number
           project_id: string
           token_id: string
+          updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -251,6 +256,8 @@ export interface Database {
           id?: number
           project_id: string
           token_id: string
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -258,6 +265,8 @@ export interface Database {
           id?: number
           project_id?: string
           token_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -279,6 +288,13 @@ export interface Database {
             columns: ["token_id"]
             isOneToOne: false
             referencedRelation: "tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tokens_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
@@ -335,6 +351,8 @@ export interface Database {
           id: string
           is_active: boolean
           name: string
+          updated_at: string | null
+          updated_by: string | null
           value: string
         }
         Insert: {
@@ -343,6 +361,8 @@ export interface Database {
           id?: string
           is_active?: boolean
           name?: string
+          updated_at?: string | null
+          updated_by?: string | null
           value: string
         }
         Update: {
@@ -351,12 +371,21 @@ export interface Database {
           id?: string
           is_active?: boolean
           name?: string
+          updated_at?: string | null
+          updated_by?: string | null
           value?: string
         }
         Relationships: [
           {
             foreignKeyName: "tokens_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tokens_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
