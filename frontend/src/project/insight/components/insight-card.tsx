@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import { Button } from "../../../components/ui/button";
 import dayjs from "../../../lib/dayjs";
 import { cn } from "../../../lib/utils";
 import { Insight } from "../../../types/insight";
@@ -5,20 +7,27 @@ import { Insight } from "../../../types/insight";
 type InsightCardProps = {
   insight: Insight;
   fullWidth: boolean;
+  handleInsightDelete: (id: number) => void;
+  editModeEnabled: boolean;
 };
 
 export default function InsightCard(props: InsightCardProps) {
   const {
-    insight: { name, value, createdAt, updatedAt, icon },
+    insight: { id, name, value, createdAt, updatedAt, icon },
     fullWidth,
+    editModeEnabled,
+    handleInsightDelete,
   } = props;
+
+  const handleDeleteInsightClick = () => {
+    handleInsightDelete(id);
+  };
 
   return (
     <div
       className={cn(
-        "px-6 py-4 rounded-xl border border-zinc-100 flex flex-col min-w-[380px] animate-in slide-in-from-bottom-2 hover:border-zinc-200",
+        "relative px-6 py-4 rounded-xl border border-zinc-100 flex flex-col min-w-[380px] animate-in slide-in-from-bottom-2 hover:border-zinc-200",
         fullWidth ? "w-full" : "",
-        "group",
       )}
     >
       <div className="flex justify-between items-center">
@@ -34,6 +43,17 @@ export default function InsightCard(props: InsightCardProps) {
           {dayjs().to(updatedAt || createdAt)}
         </span>
       </div>
+
+      {editModeEnabled ? (
+        <Button
+          size="icon"
+          variant="destructive"
+          className="w-5 h-5 rounded-full absolute -top-1 -right-1 animate-in slide-in-from-bottom-2"
+          onClick={handleDeleteInsightClick}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      ) : null}
     </div>
   );
 }

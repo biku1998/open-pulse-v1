@@ -1,7 +1,10 @@
+import * as React from "react";
 import { useParams } from "react-router-dom";
-import { Lightbulb } from "lucide-react";
+import { Edit, Lightbulb, Check } from "lucide-react";
 import Nothing from "../../../components/nothing";
+import { Button } from "../../../components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
+import { cn } from "../../../lib/utils";
 import ProjectHeader from "../../components/project-header";
 import InsightCard from "../components/insight-card";
 import { useFetchInsights } from "../queries";
@@ -9,11 +12,37 @@ import { useFetchInsights } from "../queries";
 export default function InsightPage() {
   const { projectId = "" } = useParams();
 
+  const [editModeEnabled, setEditModeEnabled] = React.useState(false);
+
   const fetchInsightsQuery = useFetchInsights(projectId);
+
+  const toggleEditMode = () => {
+    setEditModeEnabled((prev) => !prev);
+  };
+
+  const handleInsightDelete = (id: number) => {
+    console.log("Delete insight with id: ", id);
+  };
 
   return (
     <>
-      <ProjectHeader />
+      <ProjectHeader>
+        <Button
+          size="icon"
+          variant={editModeEnabled ? "default" : "ghost"}
+          className={cn(
+            "mr-4",
+            editModeEnabled ? "" : "text-zinc-500 hover:text-zinc-600",
+          )}
+          onClick={toggleEditMode}
+        >
+          {editModeEnabled ? (
+            <Check className="h-4 w-4 animate-in slide-in-from-bottom-2" />
+          ) : (
+            <Edit className="h-4 w-4 animate-in slide-in-from-bottom-2" />
+          )}
+        </Button>
+      </ProjectHeader>
       <div
         className="flex flex-col items-center mx-auto gap-6 py-6 max-w-[780px]"
         key={projectId}
@@ -37,6 +66,8 @@ export default function InsightPage() {
                     fetchInsightsQuery.data.indexOf(insight) ===
                       fetchInsightsQuery.data.length - 1
                   }
+                  handleInsightDelete={handleInsightDelete}
+                  editModeEnabled={editModeEnabled}
                 />
               ))
             : null}

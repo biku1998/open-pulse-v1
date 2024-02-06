@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Copy, Loader2 } from "lucide-react";
 import * as z from "zod";
 import { useGetUser } from "../../../auth/user-store";
 import { Button } from "../../../components/ui/button";
@@ -56,6 +56,11 @@ export default function EditProjectForm(props: EditProjectFormProps) {
     });
   }
 
+  const handleCopyProjectIdClick = () => {
+    navigator.clipboard.writeText(projectId);
+    toast("Project ID copied to clipboard");
+  };
+
   return (
     <section className="p-6 border border-zinc-200 rounded-[8px] w-full animate-in slide-in-from-bottom-2">
       <Form {...form}>
@@ -94,6 +99,24 @@ export default function EditProjectForm(props: EditProjectFormProps) {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
               {updateProjectMutation.isPending ? "Please wait..." : "Save"}
+            </Button>
+          </div>
+          <div className="flex items-center">
+            <span className="text-sm text-zinc-500 mr-3">Project ID</span>
+            <Input
+              type="text"
+              value={projectId}
+              disabled
+              className="w-[50%] mr-4"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              type="button"
+              className="text-zinc-400 hover:text-zinc-600"
+              onClick={handleCopyProjectIdClick}
+            >
+              <Copy className="h-4 w-4" />
             </Button>
           </div>
         </form>
