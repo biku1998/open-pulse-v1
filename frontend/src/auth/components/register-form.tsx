@@ -59,7 +59,7 @@ export default function RegisterForm(props: RegisterFormProps) {
           className="flex flex-col items-center"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <h1 className="text-3xl font font-semibold">Create an account</h1>
+          <h1 className="text-3xl font-sans font-bold">Create an account</h1>
           <div className="flex flex-col items-center gap-5 mt-8 w-[360px]">
             <FormField
               control={form.control}

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import BgPattern from "../../assets/bg-pattern.svg";
-import Logo from "../../assets/logo.png";
+import Logo from "../../components/logo";
 import { AuthSuccessResponse } from "../api";
 import LoginForm from "../components/login-form";
 import { useUserStore } from "../user-store";
@@ -26,12 +26,7 @@ export default function LoginPage() {
         loading="eager"
       />
 
-      <img
-        src={Logo}
-        alt="Open pulse logo"
-        loading="eager"
-        className="h-[42px] w-[40px] mb-6"
-      />
+      <Logo className="mb-6" />
 
       <LoginForm onLogin={onLogin} />
     </main>
