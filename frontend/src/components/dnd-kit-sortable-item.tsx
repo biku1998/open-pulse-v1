@@ -11,10 +11,11 @@ type DnDKitSortableItemProps = {
     listeners: any;
     attributes: DraggableAttributes;
   }) => React.ReactNode;
+  className?: string;
 };
 
 export default function DnDKitSortableItem(props: DnDKitSortableItemProps) {
-  const { render, id } = props;
+  const { render, id, className = "" } = props;
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id,
@@ -26,7 +27,7 @@ export default function DnDKitSortableItem(props: DnDKitSortableItemProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div ref={setNodeRef} style={style} className={className}>
       {render({ listeners, attributes })}
     </div>
   );

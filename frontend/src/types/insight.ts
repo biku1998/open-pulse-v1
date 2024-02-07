@@ -4,6 +4,7 @@ const InsightSchema = z.object({
   id: z.number(),
   name: z.string(),
   value: z.string(),
+  position: z.number(),
   icon: z.string().nullable(),
   projectId: z.string().uuid(),
   createdBy: z.string().uuid(),

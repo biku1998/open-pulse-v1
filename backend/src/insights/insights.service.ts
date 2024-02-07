@@ -42,16 +42,27 @@ export class InsightsService {
         // update the insight value
         await this.databaseService.sql`
       UPDATE insights
-      SET value = ${value}, icon = ${icon || insights[0].icon}
+      SET value = ${value}, icon = ${
+        icon || insights[0].icon
+      }, updated_at = NOW()
       WHERE id = ${insights[0].id}
       `;
         return;
       }
 
+      // fetch the total number of insights
+      const totalInsights = await this.databaseService.sql<
+        Pick<Database['public']['Tables']['insights']['Row'], 'id'>[]
+      >`
+      SELECT id FROM insights WHERE project_id = ${projectId}
+      `;
+
       // create the insight
       await this.databaseService.sql`
-      INSERT INTO insights (project_id, name, value, created_by, icon)
-      VALUES (${projectId}, ${name}, ${value}, ${ownerUserId}, ${icon || null})
+      INSERT INTO insights (project_id, name, value, created_by, icon, position)
+      VALUES (${projectId}, ${name}, ${value}, ${ownerUserId}, ${
+        icon || null
+      }, ${totalInsights.length + 1})
       `;
     } catch (error) {
       if (error instanceof NotFoundException) {

@@ -1,6 +1,13 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
+// eslint-disable-next-line import/named
+import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { AlertCircle, Edit, Lightbulb } from "lucide-react";
+import DnDKitSortableItem from "../../../components/dnd-kit-sortable-item";
 import Nothing from "../../../components/nothing";
 import {
   Alert,
@@ -19,7 +26,7 @@ import { cn } from "../../../lib/utils";
 import { useConfirmationDialog } from "../../../zustand-stores";
 import ProjectHeader from "../../components/project-header";
 import InsightCard from "../components/insight-card";
-import { useDeleteInsight } from "../mutations";
+import { useDeleteInsight, useUpdateInsight } from "../mutations";
 import { useFetchInsights } from "../queries";
 
 export default function InsightPage() {
@@ -35,6 +42,8 @@ export default function InsightPage() {
 
   const fetchInsightsQuery = useFetchInsights(projectId);
   const deleteInsightMutation = useDeleteInsight();
+
+  const updateInsightMutation = useUpdateInsight();
 
   const toggleEditMode = () => {
     setEditModeEnabled((prev) => !prev);
@@ -70,6 +79,40 @@ export default function InsightPage() {
       },
       confirmButtonVariant: "destructive",
       confirmButtonText: "Delete",
+    });
+  };
+
+  const handleInsightDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    if (active.id === over.id) return;
+    if (!fetchInsightsQuery.data) return;
+
+    const activeUniqueId = parseInt(active.id.toString());
+    const overUniqueId = parseInt(over.id.toString());
+
+    updateInsightMutation.mutate({
+      id: activeUniqueId,
+      projectId,
+      payload: {
+        position:
+          fetchInsightsQuery.data.findIndex(
+            (insight) => insight.id === overUniqueId,
+          ) + 1,
+      },
+    });
+
+    updateInsightMutation.mutate({
+      id: overUniqueId,
+      projectId,
+      payload: {
+        position:
+          fetchInsightsQuery.data.findIndex(
+            (insight) => insight.id === activeUniqueId,
+          ) + 1,
+      },
     });
   };
 
@@ -109,7 +152,12 @@ export default function InsightPage() {
         className="flex flex-col items-center mx-auto gap-6 py-6 max-w-[780px]"
         key={projectId}
       >
-        <div className="flex gap-5 flex-wrap">
+        <div
+          className={cn(
+            "flex gap-5 flex-wrap",
+            editModeEnabled ? "flex-col" : "",
+          )}
+        >
           {fetchInsightsQuery.isPending ? (
             <>
               <Skeleton className="h-[102px] w-[380px] rounded-xl" />
@@ -118,21 +166,50 @@ export default function InsightPage() {
             </>
           ) : null}
 
-          {fetchInsightsQuery.data
-            ? fetchInsightsQuery.data.map((insight) => (
-                <InsightCard
-                  key={insight.id}
-                  insight={insight}
-                  fullWidth={
-                    fetchInsightsQuery.data.length % 2 !== 0 &&
-                    fetchInsightsQuery.data.indexOf(insight) ===
-                      fetchInsightsQuery.data.length - 1
-                  }
-                  handleInsightDelete={handleInsightDelete}
-                  editModeEnabled={editModeEnabled}
-                />
-              ))
-            : null}
+          {fetchInsightsQuery.data ? (
+            <DndContext
+              onDragEnd={handleInsightDragEnd}
+              collisionDetection={closestCenter}
+            >
+              <SortableContext
+                items={fetchInsightsQuery.data.map((insight) =>
+                  insight.id.toString(),
+                )}
+                disabled={editModeEnabled === false}
+                strategy={verticalListSortingStrategy}
+              >
+                {fetchInsightsQuery.data.map((insight) => (
+                  <DnDKitSortableItem
+                    key={insight.id}
+                    id={insight.id.toString()}
+                    className={cn(
+                      fetchInsightsQuery.data.length % 2 !== 0 &&
+                        fetchInsightsQuery.data.indexOf(insight) ===
+                          fetchInsightsQuery.data.length - 1 &&
+                        editModeEnabled === false
+                        ? "w-full"
+                        : "",
+                    )}
+                    render={({ listeners, attributes }) => (
+                      <InsightCard
+                        key={insight.id}
+                        {...listeners}
+                        {...attributes}
+                        insight={insight}
+                        fullWidth={
+                          fetchInsightsQuery.data.length % 2 !== 0 &&
+                          fetchInsightsQuery.data.indexOf(insight) ===
+                            fetchInsightsQuery.data.length - 1
+                        }
+                        handleInsightDelete={handleInsightDelete}
+                        editModeEnabled={editModeEnabled}
+                      />
+                    )}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : null}
 
           {fetchInsightsQuery.data ? (
             fetchInsightsQuery.data.length === 0 ? (

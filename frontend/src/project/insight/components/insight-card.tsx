@@ -9,6 +9,7 @@ type InsightCardProps = {
   fullWidth: boolean;
   handleInsightDelete: (args: { id: number; name: string }) => void;
   editModeEnabled: boolean;
+  [key: string]: unknown;
 };
 
 export default function InsightCard(props: InsightCardProps) {
@@ -17,6 +18,7 @@ export default function InsightCard(props: InsightCardProps) {
     fullWidth,
     editModeEnabled,
     handleInsightDelete,
+    ...rest
   } = props;
 
   const handleDeleteInsightClick = () => {
@@ -29,6 +31,7 @@ export default function InsightCard(props: InsightCardProps) {
         "relative px-6 py-4 rounded-xl border border-zinc-100 flex flex-col min-w-[380px] animate-in slide-in-from-bottom-2 hover:border-zinc-200",
         fullWidth ? "w-full" : "",
       )}
+      {...rest}
     >
       {editModeEnabled ? (
         <Button
