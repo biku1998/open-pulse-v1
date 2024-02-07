@@ -1,0 +1,1 @@
+alter table public.insights add column position integer not null default 0;

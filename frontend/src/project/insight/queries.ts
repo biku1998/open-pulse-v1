@@ -9,7 +9,7 @@ const fetchInsights = async (projectId: string): Promise<Insight[]> => {
     .from("insights")
     .select("*")
     .eq("project_id", projectId)
-    .order("created_at", { ascending: false });
+    .order("position");
 
   if (error) throw new Error("Failed to fetch insights");
 

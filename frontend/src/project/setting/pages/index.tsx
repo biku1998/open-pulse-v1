@@ -102,7 +102,7 @@ export default function SettingPage() {
         <ManageChannels projectId={projectId} />
         <section className="p-6 border border-zinc-200 rounded-[8px] w-full animate-in slide-in-from-bottom-2 flex flex-col gap-6">
           <h2 className="font-semibold">Danger zone</h2>
-          <div className="p-5 rounded-[8px] w-full border border-red-400 bg-red-50 flex flex-col gap-4">
+          <div className="p-5 rounded-[8px] w-full border border-red-200 bg-red-50 flex flex-col gap-4">
             <p className="text-red-600 font-medium text-sm">
               This project will be deleted with all it&apos;s data
             </p>
