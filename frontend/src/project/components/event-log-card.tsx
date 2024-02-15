@@ -30,7 +30,7 @@ export default function EventLogCard(props: EventLogCardProps) {
     props;
 
   return (
-    <div className="relative group p-5 flex gap-5 border border-zinc-100 rounded-[8px] hover:border-zinc-200 w-[560px] animate-in slide-in-from-bottom-2">
+    <div className="relative group p-5 flex gap-5 border border-zinc-200 rounded-[8px] hover:border-zinc-300 w-[560px] animate-in slide-in-from-bottom-2">
       <div className="w-12 h-12 px-2 py-[10px] bg-green-50 flex items-center justify-center rounded-[8px]">
         <span className="text-lg">{event.icon}</span>
       </div>
