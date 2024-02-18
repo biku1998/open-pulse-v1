@@ -10,7 +10,7 @@ export class ChartsController {
     return this.chartsService.getChartData(
       id,
       // TODO : replace hard coded user id
-      'd56b82d2-fabc-44ba-953e-36b14fa40300',
+      '83e5ec13-e1e2-43a2-95e5-c91a3df8f72f',
     );
   }
 }

@@ -32,7 +32,7 @@ export const CHART_CONDITION_FIELD_TYPES = [
   'USER_ID',
 ] as const;
 
-const ChartConditionFieldType = z.enum(CHART_CONDITION_FIELD_TYPES);
+export const ChartConditionFieldType = z.enum(CHART_CONDITION_FIELD_TYPES);
 
 export const CHART_CONDITION_OPERATOR = ['EQUALS', 'NOT_EQUALS'] as const;
 
