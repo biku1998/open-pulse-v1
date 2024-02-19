@@ -8,6 +8,7 @@ import {
 import { PostgresError } from 'postgres';
 import { DatabaseService } from 'src/database/database.service';
 import { Tables } from 'src/types/supabase-db';
+import { keyBy } from 'lodash';
 
 // type EventNameCondition = Omit<Tables<'chart_conditions'>, 'field'> & {
 //   field: 'EVENT_NAME';
@@ -71,7 +72,22 @@ export class ChartsService {
         }
       });
 
-      // return this.filterEventsByChartConditions(conditions);
+      const events: Tables<'events'>[] = [];
+
+      for (const condition of nestedConditionsArr) {
+        const results = await this.filterEventsByChartConditions(condition);
+        events.push(...results);
+      }
+
+      const uniqueEvents = Object.values(keyBy(events, 'id'));
+
+      return {
+        count: uniqueEvents.length,
+        data: uniqueEvents.map((uniqueEvent) => ({
+          ...uniqueEvent,
+          id: Number(uniqueEvent.id),
+        })),
+      };
     } catch (error) {
       if (error instanceof PostgresError) {
         this.logger.error(
@@ -91,32 +107,38 @@ export class ChartsService {
         this.filterEventsByChartConditions.name
       } called with conditions [${JSON.stringify(conditions)}]`,
     );
-
+    const events: Tables<'events'>[] = [];
     try {
-      const events: Tables<'events'>[] = [];
+      const eventNameConditions = conditions.filter(
+        (condition) => condition.field === 'EVENT_NAME',
+      );
 
-      // TODO: if it works, call these two functions in parallel
-      const filteredEventsByEventNameConditions =
-        await this.filterEventsByEventNameConditions(
-          conditions.filter((condition) => condition.field === 'EVENT_NAME'),
-        );
+      if (eventNameConditions.length !== 0) {
+        // we have both event name and event tag conditions
+        const filteredEventsByEventNameConditions =
+          await this.filterEventsByEventNameConditions(eventNameConditions);
 
-      events.push(...filteredEventsByEventNameConditions);
+        if (eventNameConditions.length !== conditions.length) {
+          const filteredEventsByEventTagConditions =
+            await this.filterEventsByEventTagConditions(
+              conditions.filter(
+                (condition) => condition.field !== 'EVENT_NAME',
+              ),
+              filteredEventsByEventNameConditions,
+            );
+          events.push(...filteredEventsByEventTagConditions);
+        } else {
+          events.push(...filteredEventsByEventNameConditions);
+        }
+      }
 
       const filteredEventsByEventTagConditions =
         await this.filterEventsByEventTagConditions(
-          conditions.filter(
-            (condition) =>
-              condition.field === 'TAG_KEY' || condition.field === 'TAG_VALUE',
-          ),
+          conditions.filter((condition) => condition.field !== 'EVENT_NAME'),
+          [],
         );
 
       events.push(...filteredEventsByEventTagConditions);
-
-      return {
-        count: events.length,
-        data: events,
-      };
     } catch (error) {
       if (error instanceof PostgresError) {
         this.logger.error(
@@ -124,12 +146,20 @@ export class ChartsService {
         );
         throw new InternalServerErrorException('database error');
       }
+    } finally {
+      return events;
     }
   }
 
   async filterEventsByEventNameConditions(
     conditions: Tables<'chart_conditions'>[],
   ): Promise<Tables<'events'>[]> {
+    this.logger.log(
+      `${
+        this.filterEventsByEventNameConditions.name
+      } called with conditions [${JSON.stringify(conditions)}]`,
+    );
+
     if (conditions.length === 0) return [];
 
     if (conditions.some((condition) => condition.field !== 'EVENT_NAME'))
@@ -165,6 +195,7 @@ export class ChartsService {
       }
     });
 
+    this.logger.log(`whereCondition: ${whereCondition}`);
     const events = await this.databaseService.sql<Tables<'events'>[]>`
       SELECT * FROM public.events WHERE ${this.databaseService.sql.unsafe(
         whereCondition,
@@ -175,7 +206,64 @@ export class ChartsService {
 
   async filterEventsByEventTagConditions(
     conditions: Tables<'chart_conditions'>[],
+    events: Tables<'events'>[],
   ): Promise<Tables<'events'>[]> {
+    this.logger.log(
+      `${
+        this.filterEventsByEventTagConditions.name
+      } called with conditions [${JSON.stringify(conditions)}] and ${
+        events.length
+      } events`,
+    );
+    const tagKeyConditions = conditions.filter(
+      (condition) => condition.field === 'TAG_KEY',
+    );
+
+    if (tagKeyConditions.length === 0) return [];
+
+    const tagValueConditions = conditions.filter(
+      (condition) => condition.field === 'TAG_VALUE',
+    );
+
+    if (tagValueConditions.length === 0) return [];
+
+    let whereCondition = '';
+
+    tagKeyConditions.forEach((tagKeyCondition) => {
+      const childConditions = tagValueConditions.filter(
+        (c) => c.parent_id === tagKeyCondition.id,
+      );
+
+      if (childConditions.length !== 0) {
+        const logicalOperator = childConditions[0].logical_operator;
+
+        if (logicalOperator) {
+          whereCondition += `(key ${
+            tagKeyCondition.operator === 'EQUALS' ? '=' : '<>'
+          } '${tagKeyCondition.value}' AND (`;
+          childConditions.forEach((childCondition, index) => {
+            const isLast = index === childConditions.length - 1;
+
+            whereCondition += isLast
+              ? `value ${childCondition.operator === 'EQUALS' ? '=' : '<>'} '${
+                  childCondition.value
+                }')`
+              : `value ${childCondition.operator === 'EQUALS' ? '=' : '<>'} '${
+                  childCondition.value
+                }' ${logicalOperator} `;
+          });
+          whereCondition += ') ';
+        }
+      }
+    });
+
+    const eventTags = await this.databaseService.sql<
+      Pick<Tables<'event_tags'>, 'event_id'>[]
+    >`
+    SELECT event_id FROM public.event_tags WHERE ${this.databaseService.sql.unsafe(
+      whereCondition,
+    )}`;
+    console.log(eventTags);
     return [];
   }
 }
