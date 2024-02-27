@@ -8,6 +8,7 @@ import RootLayout from "./components/root-layout";
 import HomePage from "./home/pages";
 import PageNotFound from "./pages/404";
 import ChannelPage from "./project/channel/pages";
+import ChartPage from "./project/charts/pages";
 import InsightPage from "./project/insight/pages";
 import ProjectPage from "./project/pages";
 import FeedPage from "./project/pages/feed";
@@ -71,13 +72,7 @@ const router = createBrowserRouter([
       },
       {
         path: "chart",
-        element: (
-          <div className="w-full flex flex-col items-center mt-[200px]">
-            <h1 className="text-4xl font-extrabold text-zinc-500 animate-in slide-in-from-bottom-2">
-              Charts
-            </h1>
-          </div>
-        ),
+        element: <ChartPage />,
       },
       {
         path: "insight",

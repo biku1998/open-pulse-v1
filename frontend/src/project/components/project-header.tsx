@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Check, ChevronRight, ChevronsUpDown } from "lucide-react";
 import { Button } from "../../components/ui/button";

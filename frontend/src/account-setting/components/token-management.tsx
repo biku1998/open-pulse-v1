@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import _omit from "lodash/omit";
 import { Settings, Eye, EyeOff, Copy } from "lucide-react";
 import { useGetUser } from "../../auth/user-store";

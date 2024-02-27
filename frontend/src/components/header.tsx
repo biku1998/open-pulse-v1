@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { HEADER_HEIGHT } from "../constants";
 import { cn } from "../lib/utils";
 import Logo from "./logo";

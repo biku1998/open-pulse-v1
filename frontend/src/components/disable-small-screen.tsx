@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import SmallScreenMessage from "./small-screen-message";
 
 export default function DisableSmallScreen({

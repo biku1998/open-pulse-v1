@@ -10,14 +10,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { Tables } from 'src/types/supabase-db';
 import { keyBy } from 'lodash';
 
-// type EventNameCondition = Omit<Tables<'chart_conditions'>, 'field'> & {
-//   field: 'EVENT_NAME';
-// };
-
-// type EventTagCondition = Omit<Tables<'chart_conditions'>, 'field'> & {
-//   field: 'TAG_KEY' | 'TAG_VALUE';
-// };
-
 @Injectable()
 export class ChartsService {
   private readonly logger = new Logger(ChartsService.name);
@@ -116,11 +108,11 @@ export class ChartsService {
       if (eventNameConditions.length !== 0) {
         // we have both event name and event tag conditions
         const filteredEventsByEventNameConditions =
-          await this.filterEventsByEventNameConditions(eventNameConditions);
+          await this.filterEventsByNameConditions(eventNameConditions);
 
         if (eventNameConditions.length !== conditions.length) {
           const filteredEventsByEventTagConditions =
-            await this.filterEventsByEventTagConditions(
+            await this.filterEventsByTagConditions(
               conditions.filter(
                 (condition) => condition.field !== 'EVENT_NAME',
               ),
@@ -133,7 +125,7 @@ export class ChartsService {
       }
 
       const filteredEventsByEventTagConditions =
-        await this.filterEventsByEventTagConditions(
+        await this.filterEventsByTagConditions(
           conditions.filter((condition) => condition.field !== 'EVENT_NAME'),
           [],
         );
@@ -151,12 +143,12 @@ export class ChartsService {
     }
   }
 
-  async filterEventsByEventNameConditions(
+  async filterEventsByNameConditions(
     conditions: Tables<'chart_conditions'>[],
   ): Promise<Tables<'events'>[]> {
     this.logger.log(
       `${
-        this.filterEventsByEventNameConditions.name
+        this.filterEventsByNameConditions.name
       } called with conditions [${JSON.stringify(conditions)}]`,
     );
 
@@ -204,13 +196,13 @@ export class ChartsService {
     return events;
   }
 
-  async filterEventsByEventTagConditions(
+  async filterEventsByTagConditions(
     conditions: Tables<'chart_conditions'>[],
     events: Tables<'events'>[],
   ): Promise<Tables<'events'>[]> {
     this.logger.log(
       `${
-        this.filterEventsByEventTagConditions.name
+        this.filterEventsByTagConditions.name
       } called with conditions [${JSON.stringify(conditions)}] and ${
         events.length
       } events`,
@@ -263,7 +255,13 @@ export class ChartsService {
     SELECT event_id FROM public.event_tags WHERE ${this.databaseService.sql.unsafe(
       whereCondition,
     )}`;
-    console.log(eventTags);
-    return [];
+
+    if (eventTags.length === 0) return [];
+
+    const eventIds = new Set(
+      eventTags.map((eventTag) => Number(eventTag.event_id)),
+    );
+
+    return events.filter((event) => eventIds.has(Number(event.id)));
   }
 }

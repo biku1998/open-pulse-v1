@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import _keyBy from "lodash/keyBy";

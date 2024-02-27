@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Filter, Plus, X } from "lucide-react";
