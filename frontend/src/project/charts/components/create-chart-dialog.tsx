@@ -135,7 +135,7 @@ export default function CreateChartDialog() {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="flex flex-col space-y-1"
+                      className="grid grid-cols-2 gap-3"
                     >
                       {CHART_TYPES.map((chartType) => (
                         <FormItem
@@ -145,7 +145,7 @@ export default function CreateChartDialog() {
                           <FormControl>
                             <RadioGroupItem value={chartType} />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal hover:cursor-pointer">
                             {chartType
                               .toLowerCase()
                               .replace(/_/g, " ")
