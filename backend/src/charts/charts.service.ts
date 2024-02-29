@@ -9,6 +9,7 @@ import { PostgresError } from 'postgres';
 import { DatabaseService } from 'src/database/database.service';
 import { Tables } from 'src/types/supabase-db';
 import { keyBy } from 'lodash';
+import { ChartAggregation } from 'src/types/chart';
 
 @Injectable()
 export class ChartsService {
@@ -90,6 +91,11 @@ export class ChartsService {
       throw error;
     }
   }
+
+  async applyAggregationToEvents(
+    events: Event[],
+    aggregation: ChartAggregation,
+  ) {}
 
   async filterEventsByChartConditions(
     conditions: Tables<'chart_conditions'>[],

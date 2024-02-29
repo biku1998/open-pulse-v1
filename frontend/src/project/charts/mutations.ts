@@ -1,7 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
 import { Chart } from "../../types/chart";
+import { chartKeys } from "./query-keys";
 
 const createChart = async (
   payload: Pick<
@@ -31,8 +32,15 @@ export const useCreateChart = ({
   onSuccess,
 }: {
   onSuccess?: (data: Chart) => void;
-} = {}) =>
-  useMutation({
+} = {}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: createChart,
-    onSuccess,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: chartKeys.list(variables.projectId),
+      });
+      if (onSuccess) onSuccess(data);
+    },
   });
+};
