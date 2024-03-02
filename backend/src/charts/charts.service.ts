@@ -9,7 +9,7 @@ import { PostgresError } from 'postgres';
 import { DatabaseService } from 'src/database/database.service';
 import { Tables } from 'src/types/supabase-db';
 import { keyBy } from 'lodash';
-import { ChartAggregation } from 'src/types/chart';
+import dayjs from 'src/lib/dayjs';
 
 @Injectable()
 export class ChartsService {
@@ -72,15 +72,19 @@ export class ChartsService {
         events.push(...results);
       }
 
-      const uniqueEvents = Object.values(keyBy(events, 'id'));
-
-      return {
-        count: uniqueEvents.length,
-        data: uniqueEvents.map((uniqueEvent) => ({
+      const uniqueEvents = Object.values(keyBy(events, 'id')).map(
+        (uniqueEvent) => ({
           ...uniqueEvent,
           id: Number(uniqueEvent.id),
-        })),
-      };
+        }),
+      );
+
+      const aggregatedEvents = await this.applyAggregationToEvents(
+        uniqueEvents,
+        aggregations,
+      );
+
+      return aggregatedEvents;
     } catch (error) {
       if (error instanceof PostgresError) {
         this.logger.error(
@@ -93,9 +97,40 @@ export class ChartsService {
   }
 
   async applyAggregationToEvents(
-    events: Event[],
-    aggregation: ChartAggregation,
-  ) {}
+    events: Tables<'events'>[],
+    aggregations: Tables<'chart_aggregations'>[],
+  ) {
+    const aggregatedEvents: Record<string, number> = {};
+
+    aggregations.forEach((aggregation) => {
+      switch (aggregation.aggregation_type) {
+        case 'COUNT': {
+          events.forEach((event) => {
+            const dateStr = dayjs(event.created_at).format('DD-MM-YYYY');
+            if (aggregatedEvents[dateStr]) {
+              aggregatedEvents[dateStr]++;
+            } else {
+              aggregatedEvents[dateStr] = 1;
+            }
+          });
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    });
+
+    const aggregatedEventsArr = Object.entries(aggregatedEvents).map(
+      ([date, count]) => ({
+        date,
+        count,
+      }),
+    );
+
+    return aggregatedEventsArr;
+  }
 
   async filterEventsByChartConditions(
     conditions: Tables<'chart_conditions'>[],

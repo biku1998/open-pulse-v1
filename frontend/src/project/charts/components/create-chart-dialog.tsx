@@ -66,9 +66,7 @@ export default function CreateChartDialog() {
     console.log(data);
   }
 
-  const chartTypeWatcher = form.watch("chartType");
-
-  console.log(chartTypeWatcher);
+  // const chartTypeWatcher = form.watch("chartType");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

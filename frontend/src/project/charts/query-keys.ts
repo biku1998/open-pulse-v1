@@ -6,4 +6,7 @@ export const chartKeys = {
 
   detail: ({ projectId, id }: { projectId: string; id: string }) =>
     [...chartKeys.all(projectId), id] as const,
+
+  data: ({ projectId, id }: { projectId: string; id: string }) =>
+    [...chartKeys.detail({ projectId, id }), "data"] as const,
 };

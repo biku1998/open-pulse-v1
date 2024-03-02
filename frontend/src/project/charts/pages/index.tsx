@@ -26,7 +26,9 @@ export default function ChartPage() {
         ) : null}
 
         {fetchChartsQuery.data
-          ? fetchChartsQuery.data.map((chart) => <ChartCard {...chart} />)
+          ? fetchChartsQuery.data.map((chart) => (
+              <ChartCard {...chart} projectId={projectId} key={chart.id} />
+            ))
           : null}
 
         {fetchChartsQuery.data ? (

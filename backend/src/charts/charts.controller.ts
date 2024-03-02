@@ -8,12 +8,16 @@ export class ChartsController {
 
   @Get(':id/data')
   async getChartData(@Param('id', ParseIntPipe) id: number) {
-    return convertSnakeCaseObjectToCamelCase(
+    const events = convertSnakeCaseObjectToCamelCase(
       await this.chartsService.getChartData(
         id,
         // TODO : replace hard coded user id
-        '83e5ec13-e1e2-43a2-95e5-c91a3df8f72f',
+        'c6895ad8-0508-4b61-8fe1-5f7c105e3c6d',
       ),
     );
+
+    return {
+      data: events,
+    };
   }
 }
