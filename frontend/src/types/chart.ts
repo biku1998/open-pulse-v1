@@ -49,8 +49,8 @@ const ChartConditionLogicalOperator = z.enum(CHART_CONDITION_LOGICAL_OPERATOR);
 
 const ChartConditionSchema = z.object({
   id: z.number(),
-  chartId: z.string().uuid(),
-  parentId: z.string().uuid().nullable(),
+  chartId: z.number(),
+  parentId: z.number().nullable(),
   field: ChartConditionFieldType,
   operator: ChartConditionOperator,
   logicalOperator: ChartConditionLogicalOperator.nullable(),
@@ -78,7 +78,7 @@ const ChartAggregationType = z.enum(CHART_AGGREGATION_TYPE);
 const ChartAggregationSchema = z.object({
   id: z.number(),
   name: z.string(),
-  chartId: z.string().uuid(),
+  chartId: z.number(),
   aggregationType: ChartAggregationType,
   field: z.string().nullable(),
   createdBy: z.string().uuid(),

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
-import { Chart } from "../../types/chart";
+import { Chart, ChartCondition } from "../../types/chart";
 import { chartKeys } from "./query-keys";
 
 const createChart = async (
@@ -42,5 +42,99 @@ export const useCreateChart = ({
       });
       if (onSuccess) onSuccess(data);
     },
+  });
+};
+
+const createChartCondition = async ({
+  payload,
+}: {
+  projectId: string;
+  payload: Omit<ChartCondition, "id" | "createdAt" | "updatedAt" | "updatedBy">;
+}): Promise<ChartCondition> => {
+  const { data, error } = await supabase
+    .from("chart_conditions")
+    .insert({
+      chart_id: payload.chartId,
+      parent_id: payload.parentId,
+      field: payload.field,
+      operator: payload.operator,
+      value: payload.value,
+      created_by: payload.createdBy,
+      logical_operator: payload.logicalOperator,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to create chart condition");
+
+  return convertToCamelCase<ChartCondition>(data);
+};
+
+export const useCreateChartCondition = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createChartCondition,
+    onSuccess: ({ chartId }, { projectId }) =>
+      queryClient.invalidateQueries({
+        queryKey: chartKeys.conditions({ projectId, id: chartId }),
+      }),
+  });
+};
+
+const updateChartCondition = async ({
+  id,
+  payload,
+}: {
+  id: number;
+  chartId: number;
+  projectId: string;
+  payload: Partial<Pick<ChartCondition, "field" | "value" | "operator">>;
+}) => {
+  const { error } = await supabase
+    .from("chart_conditions")
+    .update(payload)
+    .eq("id", id)
+    .single();
+
+  if (error) throw new Error("Failed to update chart condition");
+};
+
+export const useUpdateChartCondition = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateChartCondition,
+    onSuccess: (_, { chartId, projectId }) =>
+      queryClient.invalidateQueries({
+        queryKey: chartKeys.conditions({ projectId, id: chartId }),
+      }),
+  });
+};
+
+const deleteChartCondition = async ({
+  id,
+}: {
+  id: number;
+  chartId: number;
+  projectId: string;
+}) => {
+  const { error } = await supabase
+    .from("chart_conditions")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw new Error("Failed to delete chart condition");
+};
+
+export const useDeleteChartCondition = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteChartCondition,
+    onSuccess: (_, { chartId, projectId }) =>
+      queryClient.invalidateQueries({
+        queryKey: chartKeys.conditions({ projectId, id: chartId }),
+      }),
   });
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useGetUser } from "../../../auth/user-store";
 import { Button } from "../../../components/ui/button";
 import {
@@ -26,7 +26,9 @@ import {
 import { Input } from "../../../components/ui/input";
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
 import { Textarea } from "../../../components/ui/textarea";
+import { toast } from "../../../lib/utils";
 import { CHART_TYPES, Chart, ChartSchema } from "../../../types/chart";
+import { useCreateChart } from "../mutations";
 
 export default function CreateChartDialog() {
   const [open, setOpen] = React.useState(false);
@@ -57,16 +59,22 @@ export default function CreateChartDialog() {
     },
   });
 
+  const createChartMutation = useCreateChart({
+    onSuccess: () => {
+      setOpen(false);
+      toast.success("Chart created!");
+      form.reset();
+    },
+  });
+
   function onSubmit(
     data: Pick<
       Chart,
       "name" | "description" | "chartType" | "createdBy" | "projectId"
     >,
   ) {
-    console.log(data);
+    createChartMutation.mutate(data);
   }
-
-  // const chartTypeWatcher = form.watch("chartType");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -163,7 +171,7 @@ export default function CreateChartDialog() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  //   disabled={createProjectMutation.isPending}
+                  disabled={createChartMutation.isPending}
                 >
                   Cancel
                 </Button>
@@ -171,15 +179,14 @@ export default function CreateChartDialog() {
               <Button
                 type="submit"
                 className="w-full"
-                // disabled={createProjectMutation.isPending}
+                disabled={createChartMutation.isPending}
               >
-                {/* {createProjectMutation.isPending ? (
+                {createChartMutation.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {createProjectMutation.isPending
+                {createChartMutation.isPending
                   ? "Please wait..."
-                  : "Create project"} */}
-                Create
+                  : "Create chart"}
               </Button>
             </DialogFooter>
           </form>

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../api/api";
 import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
-import { Chart } from "../../types/chart";
+import { Chart, ChartCondition } from "../../types/chart";
 import { chartKeys } from "./query-keys";
 
 const getCharts = async (
@@ -42,4 +42,27 @@ export const useFetchChartData = ({
   useQuery({
     queryKey: chartKeys.data({ projectId, id }),
     queryFn: () => getChartData(id),
+  });
+
+const fetchChartConditions = async (id: number): Promise<ChartCondition[]> => {
+  const { data, error } = await supabase
+    .from("chart_conditions")
+    .select()
+    .eq("chart_id", id);
+
+  if (error) throw new Error("Failed to fetch chart conditions");
+
+  return convertToCamelCase<ChartCondition[]>(data);
+};
+
+export const useFetchChartConditions = ({
+  projectId,
+  id,
+}: {
+  projectId: string;
+  id: number;
+}) =>
+  useQuery({
+    queryKey: chartKeys.conditions({ projectId, id }),
+    queryFn: () => fetchChartConditions(id),
   });

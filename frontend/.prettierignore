@@ -1,4 +1,8 @@
 node_modules/
 dist/
 .swc/
-.prettierrc.js
+.prettierrc
+build
+coverage
+.gitlab
+.vscode

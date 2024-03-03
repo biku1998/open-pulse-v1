@@ -281,30 +281,43 @@ export interface Database {
       }
       event_tags: {
         Row: {
+          channel_id: string | null
           created_at: string
           created_by: string
           event_id: number
           id: number
           key: string
+          project_id: string | null
           value: string
         }
         Insert: {
+          channel_id?: string | null
           created_at?: string
           created_by: string
           event_id: number
           id?: number
           key: string
+          project_id?: string | null
           value: string
         }
         Update: {
+          channel_id?: string | null
           created_at?: string
           created_by?: string
           event_id?: number
           id?: number
           key?: string
+          project_id?: string | null
           value?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "event_tags_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "event_tags_created_by_fkey"
             columns: ["created_by"]
@@ -317,6 +330,13 @@ export interface Database {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_tags_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           }
         ]
