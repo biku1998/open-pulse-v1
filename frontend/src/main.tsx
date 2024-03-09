@@ -32,7 +32,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <ConfirmationDialog />
           <RouterProvider router={router} />
         </AuthLoader>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+        />
       </QueryClientProvider>
     </DisableSmallScreen>
   </React.StrictMode>,

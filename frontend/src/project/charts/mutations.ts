@@ -25,6 +25,25 @@ const createChart = async (
 
   if (error) throw new Error("Failed to create chart");
 
+  // we need to create one default chart condition based on what type of chart was created
+  switch (data.chart_type) {
+    case "LINE": {
+      await supabase
+        .from("chart_conditions")
+        .insert({
+          chart_id: data.id,
+          created_by: createdBy,
+          field: "EVENT_NAME",
+          value: "",
+          operator: "EQUALS",
+        })
+        .single();
+      break;
+    }
+    default:
+      throw new Error("Invalid chart type was created");
+  }
+
   return convertToCamelCase<Chart>(data);
 };
 
@@ -42,6 +61,24 @@ export const useCreateChart = ({
       });
       if (onSuccess) onSuccess(data);
     },
+  });
+};
+
+const deleteChart = async ({ id }: { id: number; projectId: string }) => {
+  const { error } = await supabase.from("charts").delete().eq("id", id);
+
+  if (error) throw new Error("Failed to delete chart");
+};
+
+export const useDeleteChart = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteChart,
+    onSuccess: (_, { projectId }) =>
+      queryClient.invalidateQueries({
+        queryKey: chartKeys.list(projectId),
+      }),
   });
 };
 

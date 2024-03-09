@@ -20,6 +20,7 @@ export default function EditChartPanel(props: EditChartPanelProps) {
   const fetchChartConditionsQuery = useFetchChartConditions({
     projectId,
     id: chartId,
+    enabled: open,
   });
 
   return (
@@ -31,6 +32,16 @@ export default function EditChartPanel(props: EditChartPanelProps) {
             Add or remove conditions to populate the chart
           </SheetDescription>
         </SheetHeader>
+
+        <div className="flex flex-col gap-2 mt-6">
+          {fetchChartConditionsQuery.isPending ? (
+            <span className="text-xs text-zinc-600">
+              Loading chart conditions
+            </span>
+          ) : null}
+
+          {JSON.stringify(fetchChartConditionsQuery.data, null, 2)}
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -8,6 +8,7 @@ import ProjectHeader from "../../components/project-header";
 import ChartCard from "../components/chart-card";
 import CreateChartDialog from "../components/create-chart-dialog";
 import EditChartPanel from "../components/edit-chart-panel";
+import { useDeleteChart } from "../mutations";
 import { useFetchCharts } from "../queries";
 
 export default function ChartPage() {
@@ -15,6 +16,7 @@ export default function ChartPage() {
 
   const { projectId = "" } = useParams();
   const fetchChartsQuery = useFetchCharts(projectId);
+  const deleteChartMutation = useDeleteChart();
 
   const { openConfirmationDialog, closeConfirmationDialog } =
     useConfirmationDialog((store) => ({
@@ -28,8 +30,10 @@ export default function ChartPage() {
       confirmButtonVariant: "destructive",
       content: <p>Chart will be deleted permanently</p>,
       onConfirm: () => {
-        // logout();
-        // navigate("/auth/login", { replace: true });
+        deleteChartMutation.mutate({
+          id,
+          projectId,
+        });
         closeConfirmationDialog();
       },
       onCancel: () => {

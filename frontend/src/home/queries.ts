@@ -56,10 +56,16 @@ const getProjectTags = async (
 ): Promise<Pick<EventTag, "id" | "key" | "value">[]> => {
   const { data, error } = await supabase
     .from("event_tags")
-    .select("tag")
+    .select("id, key, value")
     .eq("project_id", projectId);
 
   if (error) throw new Error("Failed to fetch project tags");
 
-  return convertToCamelCase<Pick<EventTag, "id" | "key" | "value">[]>(data);
+  return data;
 };
+
+export const useFetchProjectTags = (projectId: string) =>
+  useQuery({
+    queryKey: projectKeys.tags(projectId),
+    queryFn: () => getProjectTags(projectId),
+  });

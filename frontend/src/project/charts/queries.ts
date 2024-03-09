@@ -45,6 +45,7 @@ export const useFetchChartData = ({
   });
 
 const fetchChartConditions = async (id: number): Promise<ChartCondition[]> => {
+  console.log(id);
   const { data, error } = await supabase
     .from("chart_conditions")
     .select()
@@ -58,11 +59,14 @@ const fetchChartConditions = async (id: number): Promise<ChartCondition[]> => {
 export const useFetchChartConditions = ({
   projectId,
   id,
+  enabled,
 }: {
   projectId: string;
   id: number;
+  enabled?: boolean;
 }) =>
   useQuery({
     queryKey: chartKeys.conditions({ projectId, id }),
     queryFn: () => fetchChartConditions(id),
+    enabled,
   });

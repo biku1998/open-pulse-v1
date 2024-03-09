@@ -12,7 +12,7 @@ export class ChartsController {
       await this.chartsService.getChartData(
         id,
         // TODO : replace hard coded user id
-        'fcc518de-f5ba-4c95-b74e-13153c949229',
+        '27b2d438-a2f7-4461-a6ad-781e4f43faf6',
       ),
     );
 
