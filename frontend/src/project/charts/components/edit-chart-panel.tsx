@@ -1,3 +1,5 @@
+import { useGetUser } from "../../../auth/user-store";
+import { Button } from "../../../components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -5,7 +7,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../../../components/ui/sheet";
+import { useCreateChartCondition } from "../mutations";
 import { useFetchChartConditions } from "../queries";
+import ChartConditionCard from "./chart-condition-card";
 
 type EditChartPanelProps = {
   projectId: string;
@@ -16,6 +20,7 @@ type EditChartPanelProps = {
 
 export default function EditChartPanel(props: EditChartPanelProps) {
   const { projectId, chartId, open, onOpenChange } = props;
+  const user = useGetUser();
 
   const fetchChartConditionsQuery = useFetchChartConditions({
     projectId,
@@ -23,9 +28,27 @@ export default function EditChartPanel(props: EditChartPanelProps) {
     enabled: open,
   });
 
+  const createChartConditionMutation = useCreateChartCondition();
+
+  const addChartCondition = () => {
+    if (!user) return;
+    createChartConditionMutation.mutate({
+      projectId,
+      payload: {
+        chartId,
+        createdBy: user.id,
+        field: "EVENT_NAME",
+        operator: "EQUALS",
+        value: "",
+        logicalOperator: "OR",
+        parentId: null,
+      },
+    });
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[1000px]">
+      <SheetContent className="sm:max-w-[1000px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Edit chart</SheetTitle>
           <SheetDescription>
@@ -33,14 +56,49 @@ export default function EditChartPanel(props: EditChartPanelProps) {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-2 mt-6">
+        <div className="flex flex-col gap-5 mt-6">
           {fetchChartConditionsQuery.isPending ? (
             <span className="text-xs text-zinc-600">
               Loading chart conditions
             </span>
           ) : null}
 
-          {JSON.stringify(fetchChartConditionsQuery.data, null, 2)}
+          {fetchChartConditionsQuery.data
+            ? fetchChartConditionsQuery.data
+                .filter(
+                  (chartCondition) =>
+                    chartCondition.logicalOperator === "OR" ||
+                    chartCondition.logicalOperator === null,
+                )
+                .map((parentChartCondition, idx) => (
+                  <ChartConditionCard
+                    chartConditions={fetchChartConditionsQuery.data.filter(
+                      (chartCondition) =>
+                        chartCondition.parentId === parentChartCondition.id,
+                    )}
+                    key={parentChartCondition.id}
+                    parentChartCondition={parentChartCondition}
+                    projectId={projectId}
+                    isLast={
+                      fetchChartConditionsQuery.data.filter(
+                        (chartCondition) =>
+                          chartCondition.logicalOperator === "OR" ||
+                          chartCondition.logicalOperator === null,
+                      ).length ===
+                      idx + 1
+                    }
+                  />
+                ))
+            : null}
+
+          <Button
+            variant="outline"
+            className="w-fit mx-auto"
+            size="sm"
+            onClick={addChartCondition}
+          >
+            Add condition
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

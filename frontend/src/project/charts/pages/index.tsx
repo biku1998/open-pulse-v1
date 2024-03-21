@@ -12,7 +12,7 @@ import { useDeleteChart } from "../mutations";
 import { useFetchCharts } from "../queries";
 
 export default function ChartPage() {
-  const [editChartPanelOpen, setEditChartPanelOpen] = React.useState(false);
+  const [editChartId, setEditChartId] = React.useState<number | null>(null);
 
   const { projectId = "" } = useParams();
   const fetchChartsQuery = useFetchCharts(projectId);
@@ -44,7 +44,13 @@ export default function ChartPage() {
   };
 
   const handleChartEdit = (id: number) => {
-    setEditChartPanelOpen(true);
+    setEditChartId(id);
+  };
+
+  const handleEditChartPanelOpenChange = (open: boolean) => {
+    if (!open) {
+      setEditChartId(null);
+    }
   };
 
   return (
@@ -84,12 +90,14 @@ export default function ChartPage() {
           ) : null
         ) : null}
       </div>
-      <EditChartPanel
-        projectId={projectId}
-        chartId={12}
-        open={editChartPanelOpen}
-        onOpenChange={setEditChartPanelOpen}
-      />
+      {editChartId !== null ? (
+        <EditChartPanel
+          projectId={projectId}
+          chartId={editChartId}
+          open={true}
+          onOpenChange={handleEditChartPanelOpenChange}
+        />
+      ) : null}
     </>
   );
 }

@@ -45,11 +45,11 @@ export const useFetchChartData = ({
   });
 
 const fetchChartConditions = async (id: number): Promise<ChartCondition[]> => {
-  console.log(id);
   const { data, error } = await supabase
     .from("chart_conditions")
     .select()
-    .eq("chart_id", id);
+    .eq("chart_id", id)
+    .order("created_at");
 
   if (error) throw new Error("Failed to fetch chart conditions");
 
