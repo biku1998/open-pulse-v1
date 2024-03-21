@@ -88,3 +88,4 @@ const ChartAggregationSchema = z.object({
 });
 
 export type ChartAggregation = z.infer<typeof ChartAggregationSchema>;
+export type ChartFieldType = z.infer<typeof ChartConditionFieldType>;

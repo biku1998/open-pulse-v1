@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { cn } from "../../../lib/utils";
-import { ChartCondition } from "../../../types/chart";
+import { ChartCondition, ChartFieldType } from "../../../types/chart";
 import {
   useCreateChartCondition,
   useDeleteChartCondition,
@@ -29,9 +29,6 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
   const { chartConditions, isLast, parentChartCondition, projectId } = props;
 
   const user = useGetUser();
-
-  console.log("parentChartCondition", parentChartCondition);
-  console.log("chartConditions", chartConditions);
 
   const createChartConditionMutation = useCreateChartCondition();
   const updateChartConditionMutation = useUpdateChartCondition();
@@ -64,12 +61,24 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
   return (
     <div
       className={cn(
-        "flex flex-col border py-5 border-zinc-200 rounded-lg space-y-5 divide-y divide-zinc-100",
+        "flex flex-col border py-5 border-zinc-100 rounded-lg space-y-5 divide-y divide-zinc-100",
         isLast ? "" : "relative",
       )}
     >
       <div className="flex items-center space-x-3 px-4">
-        <Select value={parentChartCondition.field}>
+        <Select
+          value={parentChartCondition.field}
+          onValueChange={(value) => {
+            updateChartConditionMutation.mutate({
+              chartId: parentChartCondition.chartId,
+              projectId,
+              id: parentChartCondition.id,
+              payload: {
+                field: value as ChartFieldType,
+              },
+            });
+          }}
+        >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Select condition criteria" />
           </SelectTrigger>
@@ -81,7 +90,19 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
           </SelectContent>
         </Select>
 
-        <Select value={parentChartCondition.operator === "EQUALS" ? "=" : "!="}>
+        <Select
+          value={parentChartCondition.operator === "EQUALS" ? "=" : "!="}
+          onValueChange={(value) => {
+            updateChartConditionMutation.mutate({
+              chartId: parentChartCondition.chartId,
+              projectId,
+              id: parentChartCondition.id,
+              payload: {
+                operator: value === "=" ? "EQUALS" : "NOT_EQUALS",
+              },
+            });
+          }}
+        >
           <SelectTrigger className="w-[70px]">
             <SelectValue placeholder="Select condition operator" />
           </SelectTrigger>
@@ -97,6 +118,16 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
           placeholder=""
           className="w-[75%]"
           value={parentChartCondition.value}
+          onChange={(e) =>
+            updateChartConditionMutation.mutate({
+              chartId: parentChartCondition.chartId,
+              projectId,
+              id: parentChartCondition.id,
+              payload: {
+                value: e.target.value,
+              },
+            })
+          }
         />
 
         {parentChartCondition.logicalOperator === null ? (
@@ -141,7 +172,19 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
           className="flex items-center space-x-3 px-4 pt-4 animate-in slide-in-from-bottom-2"
           key={chartCondition.id}
         >
-          <Select value={chartCondition.field}>
+          <Select
+            value={chartCondition.field}
+            onValueChange={(value) => {
+              updateChartConditionMutation.mutate({
+                chartId: parentChartCondition.chartId,
+                projectId,
+                id: chartCondition.id,
+                payload: {
+                  field: value as ChartFieldType,
+                },
+              });
+            }}
+          >
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Select condition criteria" />
             </SelectTrigger>
@@ -153,7 +196,19 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
             </SelectContent>
           </Select>
 
-          <Select value={chartCondition.operator === "EQUALS" ? "=" : "!="}>
+          <Select
+            value={chartCondition.operator === "EQUALS" ? "=" : "!="}
+            onValueChange={(value) => {
+              updateChartConditionMutation.mutate({
+                chartId: parentChartCondition.chartId,
+                projectId,
+                id: chartCondition.id,
+                payload: {
+                  operator: value === "=" ? "EQUALS" : "NOT_EQUALS",
+                },
+              });
+            }}
+          >
             <SelectTrigger className="w-[70px]">
               <SelectValue placeholder="Select condition operator" />
             </SelectTrigger>
@@ -169,6 +224,16 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
             placeholder=""
             className="w-[75%]"
             value={chartCondition.value}
+            onChange={(e) =>
+              updateChartConditionMutation.mutate({
+                chartId: parentChartCondition.chartId,
+                projectId,
+                id: chartCondition.id,
+                payload: {
+                  value: e.target.value,
+                },
+              })
+            }
           />
           {idx === chartConditions.length - 1 ? (
             <div className="flex items-center gap-2">
