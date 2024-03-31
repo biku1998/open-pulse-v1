@@ -69,7 +69,7 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
         createdBy: user.id,
         field: "EVENT_NAME",
         operator: "EQUALS",
-        value: Date.now().toString(),
+        value: "",
         logicalOperator: "AND",
       },
     });
@@ -178,7 +178,7 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
 
         {parentChartCondition.field === "TAG_KEY" ? (
           <Popover
-            open={Boolean(tagKeyComboboxConditionId)}
+            open={tagKeyComboboxConditionId === parentChartCondition.id}
             onOpenChange={(open) => {
               if (!open) {
                 closeCombobox();
@@ -189,7 +189,9 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
               <Button
                 variant="outline"
                 role="combobox"
-                aria-expanded={Boolean(tagKeyComboboxConditionId)}
+                aria-expanded={
+                  tagKeyComboboxConditionId === parentChartCondition.id
+                }
                 className="w-[200px] justify-between font-normal"
                 onClick={() => openCombobox(parentChartCondition.id)}
               >
@@ -201,7 +203,7 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-[200px] max-h-[350px] overflow-y-auto p-0">
               <Command>
                 <CommandInput placeholder="Search tag..." />
                 <CommandEmpty>No tag key found.</CommandEmpty>
@@ -383,21 +385,17 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
         .filter((chartCond) => chartCond.field !== "TAG_VALUE")
         .map((chartCondition, idx) => (
           <div
-            className="flex items-center space-x-3 px-4 pt-4 animate-in slide-in-from-bottom-2"
+            className="flex items-center space-x-3 px-4 pt-4 animate-in slide-in-from-bottom-4 duration-300"
             key={chartCondition.id}
           >
             <Select
               value={chartCondition.field}
-              onValueChange={(value) => {
-                updateChartConditionMutation.mutate({
-                  chartId: parentChartCondition.chartId,
-                  projectId,
-                  id: chartCondition.id,
-                  payload: {
-                    field: value as ChartFieldType,
-                  },
-                });
-              }}
+              onValueChange={(value) =>
+                handleConditionFieldTypeChange(
+                  chartCondition.id,
+                  value as ChartFieldType,
+                )
+              }
             >
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Select condition criteria" />
@@ -410,17 +408,116 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
               </SelectContent>
             </Select>
 
+            {chartCondition.field === "TAG_KEY" ? (
+              <Popover
+                open={tagKeyComboboxConditionId === chartCondition.id}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    closeCombobox();
+                  }
+                }}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={
+                      tagKeyComboboxConditionId === chartCondition.id
+                    }
+                    className="w-[200px] justify-between font-normal"
+                    onClick={() => openCombobox(chartCondition.id)}
+                  >
+                    {chartCondition.value
+                      ? tagKeys.find(
+                          (tagKey) => tagKey === chartCondition.value,
+                        )
+                      : "Select tag"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] max-h-[350px] overflow-y-auto p-0">
+                  <Command>
+                    <CommandInput placeholder="Search tag..." />
+                    <CommandEmpty>No tag key found.</CommandEmpty>
+                    <CommandGroup>
+                      {tagKeys.map((tagKey) => (
+                        <CommandItem
+                          key={tagKey}
+                          value={tagKey}
+                          onSelect={(currentValue) => {
+                            updateChartConditionMutation.mutate({
+                              chartId: chartCondition.chartId,
+                              projectId,
+                              id: chartCondition.id,
+                              payload: {
+                                value: currentValue,
+                              },
+                            });
+                            closeCombobox();
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              chartCondition.value === tagKey
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {tagKey}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            ) : null}
+
             <Select
-              value={chartCondition.operator === "EQUALS" ? "=" : "!="}
+              // value={chartCondition.operator === "EQUALS" ? "=" : "!="}
+              value={
+                chartCondition.field === "EVENT_NAME"
+                  ? chartCondition.operator === "EQUALS"
+                    ? "="
+                    : "!="
+                  : chartConditions.find(
+                        (cond) =>
+                          cond.parentId === chartCondition.id &&
+                          cond.field === "TAG_VALUE",
+                      )?.operator === "EQUALS"
+                    ? "="
+                    : "!="
+              }
               onValueChange={(value) => {
-                updateChartConditionMutation.mutate({
-                  chartId: parentChartCondition.chartId,
-                  projectId,
-                  id: chartCondition.id,
-                  payload: {
-                    operator: value === "=" ? "EQUALS" : "NOT_EQUALS",
-                  },
-                });
+                if (chartCondition.field === "EVENT_NAME") {
+                  updateChartConditionMutation.mutate({
+                    chartId: parentChartCondition.chartId,
+                    projectId,
+                    id: chartCondition.id,
+                    payload: {
+                      operator: value === "=" ? "EQUALS" : "NOT_EQUALS",
+                    },
+                  });
+                  return;
+                }
+                if (chartCondition.field === "TAG_KEY") {
+                  const childTagValueConditionId = chartConditions.find(
+                    (cond) =>
+                      cond.parentId === chartCondition.id &&
+                      cond.field === "TAG_VALUE",
+                  )?.id;
+
+                  if (!childTagValueConditionId) return;
+                  updateChartConditionMutation.mutate({
+                    chartId: parentChartCondition.chartId,
+                    projectId,
+                    id: childTagValueConditionId,
+                    payload: {
+                      operator: value === "=" ? "EQUALS" : "NOT_EQUALS",
+                    },
+                  });
+                  return;
+                }
               }}
             >
               <SelectTrigger className="w-[70px]">
@@ -437,19 +534,53 @@ export default function ChartConditionCard(props: ChartConditionCardProps) {
               type="text"
               placeholder=""
               className="w-[75%]"
-              value={chartCondition.value}
-              onChange={(e) =>
-                updateChartConditionMutation.mutate({
-                  chartId: parentChartCondition.chartId,
-                  projectId,
-                  id: chartCondition.id,
-                  payload: {
-                    value: e.target.value,
-                  },
-                })
+              // value={chartCondition.value}
+              value={
+                chartCondition.field === "EVENT_NAME"
+                  ? chartCondition.value
+                  : chartConditions.find(
+                      (cond) =>
+                        cond.parentId === chartCondition.id &&
+                        cond.field === "TAG_VALUE",
+                    )?.value
               }
+              onChange={(e) => {
+                if (chartCondition.field === "EVENT_NAME") {
+                  updateChartConditionMutation.mutate({
+                    chartId: parentChartCondition.chartId,
+                    projectId,
+                    id: chartCondition.id,
+                    payload: {
+                      value: e.target.value,
+                    },
+                  });
+                  return;
+                }
+                if (chartCondition.field === "TAG_KEY") {
+                  const childTagValueConditionId = chartConditions.find(
+                    (cond) =>
+                      cond.parentId === chartCondition.id &&
+                      cond.field === "TAG_VALUE",
+                  )?.id;
+
+                  if (!childTagValueConditionId) return;
+                  updateChartConditionMutation.mutate({
+                    chartId: parentChartCondition.chartId,
+                    projectId,
+                    id: childTagValueConditionId,
+                    payload: {
+                      value: e.target.value,
+                    },
+                  });
+                  return;
+                }
+              }}
             />
-            {idx === chartConditions.length - 1 ? (
+            {idx ===
+            chartConditions.filter(
+              (chartCond) => chartCond.field !== "TAG_VALUE",
+            ).length -
+              1 ? (
               <div className="flex items-center gap-2">
                 <Button size="icon" variant="ghost" onClick={addCondition}>
                   <Plus size={18} className="text-zinc-500" />
