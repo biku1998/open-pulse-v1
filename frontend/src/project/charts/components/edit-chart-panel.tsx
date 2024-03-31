@@ -73,8 +73,35 @@ export default function EditChartPanel(props: EditChartPanelProps) {
                 .map((parentChartCondition, idx) => (
                   <ChartConditionCard
                     chartConditions={fetchChartConditionsQuery.data.filter(
-                      (chartCondition) =>
-                        chartCondition.parentId === parentChartCondition.id,
+                      (chartCondition) => {
+                        if (
+                          chartCondition.field === "TAG_VALUE" &&
+                          chartCondition.logicalOperator === "AND"
+                        ) {
+                          const parentTagKKeyCondition =
+                            fetchChartConditionsQuery.data.find(
+                              (chartCond) =>
+                                chartCond.field === "TAG_KEY" &&
+                                chartCond.id === chartCondition.parentId,
+                            );
+
+                          if (parentTagKKeyCondition) {
+                            if (
+                              parentTagKKeyCondition.id ===
+                              parentChartCondition.id
+                            )
+                              return true;
+                            return (
+                              parentChartCondition.id ===
+                              parentTagKKeyCondition.parentId
+                            );
+                          }
+                          return false;
+                        }
+                        return (
+                          chartCondition.parentId === parentChartCondition.id
+                        );
+                      },
                     )}
                     key={parentChartCondition.id}
                     parentChartCondition={parentChartCondition}
