@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../api/supabase";
 import { convertToCamelCase } from "../lib/utils";
 import { Project } from "../types";
+import { EventTag } from "../types/event-tag";
 import { projectKeys } from "./query-keys";
 
 const fetchProjects = async (): Promise<Project[]> => {
@@ -48,4 +49,23 @@ export const useFetchProjects = () =>
       );
       return resp;
     },
+  });
+
+const getProjectTags = async (
+  projectId: string,
+): Promise<Pick<EventTag, "id" | "key" | "value">[]> => {
+  const { data, error } = await supabase
+    .from("event_tags")
+    .select("id, key, value")
+    .eq("project_id", projectId);
+
+  if (error) throw new Error("Failed to fetch project tags");
+
+  return data;
+};
+
+export const useFetchProjectTags = (projectId: string) =>
+  useQuery({
+    queryKey: projectKeys.tags(projectId),
+    queryFn: () => getProjectTags(projectId),
   });

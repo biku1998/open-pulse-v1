@@ -89,32 +89,235 @@ export interface Database {
           }
         ]
       }
+      chart_aggregations: {
+        Row: {
+          aggregation_type: Database["public"]["Enums"]["chart_aggregation_type"]
+          chart_id: number
+          created_at: string
+          created_by: string
+          field: string | null
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          aggregation_type: Database["public"]["Enums"]["chart_aggregation_type"]
+          chart_id: number
+          created_at?: string
+          created_by: string
+          field?: string | null
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          aggregation_type?: Database["public"]["Enums"]["chart_aggregation_type"]
+          chart_id?: number
+          created_at?: string
+          created_by?: string
+          field?: string | null
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_aggregations_chart_id_fkey"
+            columns: ["chart_id"]
+            isOneToOne: false
+            referencedRelation: "charts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_aggregations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_aggregations_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      chart_conditions: {
+        Row: {
+          chart_id: number
+          created_at: string
+          created_by: string
+          field: Database["public"]["Enums"]["chart_condition_field_type"]
+          id: number
+          logical_operator:
+            | Database["public"]["Enums"]["chart_condition_logical_operator"]
+            | null
+          operator: Database["public"]["Enums"]["chart_condition_operator"]
+          parent_id: number | null
+          updated_at: string | null
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          chart_id: number
+          created_at?: string
+          created_by: string
+          field: Database["public"]["Enums"]["chart_condition_field_type"]
+          id?: number
+          logical_operator?:
+            | Database["public"]["Enums"]["chart_condition_logical_operator"]
+            | null
+          operator: Database["public"]["Enums"]["chart_condition_operator"]
+          parent_id?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          chart_id?: number
+          created_at?: string
+          created_by?: string
+          field?: Database["public"]["Enums"]["chart_condition_field_type"]
+          id?: number
+          logical_operator?:
+            | Database["public"]["Enums"]["chart_condition_logical_operator"]
+            | null
+          operator?: Database["public"]["Enums"]["chart_condition_operator"]
+          parent_id?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_conditions_chart_id_fkey"
+            columns: ["chart_id"]
+            isOneToOne: false
+            referencedRelation: "charts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_conditions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_conditions_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "chart_conditions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_conditions_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      charts: {
+        Row: {
+          chart_type: Database["public"]["Enums"]["chart_type"]
+          created_at: string
+          created_by: string
+          description: string | null
+          id: number
+          name: string
+          project_id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          chart_type: Database["public"]["Enums"]["chart_type"]
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: number
+          name: string
+          project_id: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          chart_type?: Database["public"]["Enums"]["chart_type"]
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: number
+          name?: string
+          project_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       event_tags: {
         Row: {
+          channel_id: string | null
           created_at: string
           created_by: string
           event_id: number
           id: number
           key: string
+          project_id: string | null
           value: string
         }
         Insert: {
+          channel_id?: string | null
           created_at?: string
           created_by: string
           event_id: number
           id?: number
           key: string
+          project_id?: string | null
           value: string
         }
         Update: {
+          channel_id?: string | null
           created_at?: string
           created_by?: string
           event_id?: number
           id?: number
           key?: string
+          project_id?: string | null
           value?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "event_tags_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "event_tags_created_by_fkey"
             columns: ["created_by"]
@@ -127,6 +330,13 @@ export interface Database {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_tags_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           }
         ]
@@ -441,7 +651,28 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      chart_aggregation_type:
+        | "SUM"
+        | "AVG"
+        | "COUNT"
+        | "MIN"
+        | "MAX"
+        | "COUNT_DISTINCT"
+        | "MEDIAN"
+      chart_condition_field_type:
+        | "EVENT_NAME"
+        | "TAG_KEY"
+        | "TAG_VALUE"
+        | "USER_ID"
+      chart_condition_logical_operator: "AND" | "OR"
+      chart_condition_operator: "EQUALS" | "NOT_EQUALS"
+      chart_type:
+        | "LINE"
+        | "BAR"
+        | "PIE"
+        | "MULTI_LINE"
+        | "STACKED_BAR"
+        | "FUNNEL"
     }
     CompositeTypes: {
       [_ in never]: never

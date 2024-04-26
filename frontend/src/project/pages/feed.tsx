@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Rss } from "lucide-react";
 import CollapseIcon from "../../assets/collapse-icon.svg";

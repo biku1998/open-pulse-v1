@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useConfirmationDialog } from "../zustand-stores";
 import { Button } from "./ui/button";
 import {

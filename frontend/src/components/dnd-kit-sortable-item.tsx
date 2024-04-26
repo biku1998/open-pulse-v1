@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 // eslint-disable-next-line import/named
 import { DraggableAttributes } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";

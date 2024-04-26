@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { supabase } from "../../api/supabase";
 import { useUserStore } from "../user-store";
 

@@ -9,6 +9,7 @@ import { EventsModule } from './events/events.module';
 import { ProjectsModule } from './projects/projects.module';
 import { InsightsModule } from './insights/insights.module';
 import { SupabaseModule } from './supabase/supabase.module';
+import { ChartsModule } from './charts/charts.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SupabaseModule } from './supabase/supabase.module';
     ProjectsModule,
     InsightsModule,
     SupabaseModule,
+    ChartsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

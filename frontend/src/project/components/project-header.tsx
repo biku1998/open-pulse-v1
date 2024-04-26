@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Check, ChevronRight, ChevronsUpDown } from "lucide-react";
 import { Button } from "../../components/ui/button";
@@ -47,7 +47,7 @@ export default function ProjectHeader(props: ProjectHeaderProps) {
     >
       <div className="flex items-center gap-2 border-b border-solid border-slate-200 w-full h-full pl-4 pr-10">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="text-zinc-500">
+          <Button variant="ghost" size="sm" className="text-zinc-600">
             Projects
           </Button>
         </Link>

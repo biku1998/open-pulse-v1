@@ -64,6 +64,8 @@ export class EventsService {
         key: tag.key,
         value: tag.value,
         created_by: ownerUserId,
+        project_id: projectId,
+        channel_id: channelId,
       }));
       await this.databaseService.sql`
       INSERT INTO event_tags ${this.databaseService.sql(
@@ -72,6 +74,8 @@ export class EventsService {
         'key',
         'value',
         'created_by',
+        'project_id',
+        'channel_id',
       )}
       RETURNING id;
       `;

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { Rss, BarChart4, Settings, Hash, Lightbulb } from "lucide-react";
 import Logo from "../../components/logo";
