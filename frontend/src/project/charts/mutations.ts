@@ -102,6 +102,14 @@ const createChartCondition = async ({
     .select()
     .single();
 
+  // NOTE: remove this later
+  // with chart we are going to create a default aggregation
+  await supabase.from("chart_aggregations").insert({
+    chart_id: payload.chartId,
+    aggregation_type: "COUNT",
+    created_by: payload.createdBy,
+  });
+
   if (error) throw new Error("Failed to create chart condition");
 
   return convertToCamelCase<ChartCondition>(data);
