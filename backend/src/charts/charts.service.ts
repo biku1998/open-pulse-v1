@@ -16,36 +16,6 @@ export class ChartsService {
   private readonly logger = new Logger(ChartsService.name);
   constructor(private readonly databaseService: DatabaseService) {}
 
-  getChildConditions(
-    condition: Tables<'chart_conditions'>,
-    conditions: Array<Tables<'chart_conditions'>>,
-  ): Array<Array<Tables<'chart_conditions'>>> {
-    const parentConditionId = condition.id;
-
-    const childConditions = conditions.filter(
-      (c) => c.parent_id === parentConditionId,
-    );
-
-    console.log('childConditions: ', childConditions);
-
-    return [childConditions];
-    // let childExists = true;
-
-    // while (childExists) {
-    //   const childConditions = conditions.filter(
-    //     (c) => c.parent_id === condition.id,
-    //   );
-
-    //   if (childConditions.length === 0) {
-    //     childExists = false;
-    //   } else {
-    //     childConditions.forEach((childCondition) => {
-    //       this.getChildConditions(childCondition, conditions);
-    //     });
-    //   }
-    // }
-  }
-
   async getChartData(id: number, userId: string) {
     this.logger.log(
       `${this.getChartData.name} called with id [${id}], userId [${userId}]`,
@@ -96,10 +66,6 @@ export class ChartsService {
 
           return c.parent_id === condition.id;
         });
-
-        console.log(
-          `condition [${condition.id}] has children ids  [${childConditions.map((c) => c.id)}]`,
-        );
 
         if (childConditions.length === 0) {
           if (childConditionIds.includes(Number(condition.id)) === false) {
@@ -276,7 +242,6 @@ export class ChartsService {
       }
     });
 
-    this.logger.log(`whereCondition: ${whereCondition}`);
     const events = await this.databaseService.sql<Tables<'events'>[]>`
       SELECT * FROM public.events WHERE ${this.databaseService.sql.unsafe(
         whereCondition,
