@@ -16,6 +16,36 @@ export class ChartsService {
   private readonly logger = new Logger(ChartsService.name);
   constructor(private readonly databaseService: DatabaseService) {}
 
+  getChildConditions(
+    condition: Tables<'chart_conditions'>,
+    conditions: Array<Tables<'chart_conditions'>>,
+  ): Array<Array<Tables<'chart_conditions'>>> {
+    const parentConditionId = condition.id;
+
+    const childConditions = conditions.filter(
+      (c) => c.parent_id === parentConditionId,
+    );
+
+    console.log('childConditions: ', childConditions);
+
+    return [childConditions];
+    // let childExists = true;
+
+    // while (childExists) {
+    //   const childConditions = conditions.filter(
+    //     (c) => c.parent_id === condition.id,
+    //   );
+
+    //   if (childConditions.length === 0) {
+    //     childExists = false;
+    //   } else {
+    //     childConditions.forEach((childCondition) => {
+    //       this.getChildConditions(childCondition, conditions);
+    //     });
+    //   }
+    // }
+  }
+
   async getChartData(id: number, userId: string) {
     this.logger.log(
       `${this.getChartData.name} called with id [${id}], userId [${userId}]`,
@@ -33,7 +63,7 @@ export class ChartsService {
       // check if the chart has any condition and aggregations attached
       const conditions = await this.databaseService.sql<
         Tables<'chart_conditions'>[]
-      >`SELECT * FROM public.chart_conditions WHERE chart_id = ${id} AND created_by = ${userId}`;
+      >`SELECT * FROM public.chart_conditions WHERE chart_id = ${id} AND created_by = ${userId} order by created_at asc`;
 
       if (conditions.length === 0) {
         throw new BadRequestException('chart does not have any conditions');
@@ -51,8 +81,24 @@ export class ChartsService {
       const childConditionIds: number[] = [];
 
       conditions.forEach((condition) => {
-        const childConditions = conditions.filter(
-          (c) => c.parent_id === condition.id,
+        const childConditions = conditions.filter((c) => {
+          if (c.field === 'TAG_VALUE') {
+            const tagKeyCondition = conditions.find(
+              (c) => c.parent_id === condition.id,
+            );
+
+            if (!tagKeyCondition) {
+              return false;
+            }
+
+            return condition.id === tagKeyCondition.parent_id;
+          }
+
+          return c.parent_id === condition.id;
+        });
+
+        console.log(
+          `condition [${condition.id}] has children ids  [${childConditions.map((c) => c.id)}]`,
         );
 
         if (childConditions.length === 0) {
@@ -60,8 +106,10 @@ export class ChartsService {
             nestedConditionsArr.push([condition]);
           }
         } else {
-          childConditionIds.push(...childConditions.map((c) => Number(c.id)));
-          nestedConditionsArr.push([condition, ...childConditions]);
+          if (condition.parent_id === null) {
+            childConditionIds.push(...childConditions.map((c) => Number(c.id)));
+            nestedConditionsArr.push([condition, ...childConditions]);
+          }
         }
       });
 

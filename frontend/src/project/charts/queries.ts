@@ -27,21 +27,26 @@ export const useFetchCharts = (projectId: string) => {
   });
 };
 
-const getChartData = async (id: number) => {
-  const resp = await api.get<{ data: unknown[] }>(`/charts/${id}/data`);
+const getChartData = async (id: number, userId: string) => {
+  const resp = await api.get<{ data: unknown[] }>(
+    `/charts/${id}/data?userId=${userId}`,
+  );
   return resp.data.data;
 };
 
 export const useFetchChartData = ({
+  userId,
   projectId,
   id,
 }: {
   projectId: string;
+  userId: string;
   id: number;
 }) =>
   useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: chartKeys.data({ projectId, id }),
-    queryFn: () => getChartData(id),
+    queryFn: () => getChartData(id, userId),
   });
 
 const fetchChartConditions = async (id: number): Promise<ChartCondition[]> => {

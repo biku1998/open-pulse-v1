@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useGetUser } from "../../../auth/user-store";
 import { Button } from "../../../components/ui/button";
 import {
   DropdownMenu,
@@ -38,7 +39,13 @@ export default function ChartCard(props: ChartCardProps) {
     handleChartEdit,
   } = props;
 
-  const fetchChartDataQuery = useFetchChartData({ projectId, id });
+  const user = useGetUser();
+
+  const fetchChartDataQuery = useFetchChartData({
+    projectId,
+    id,
+    userId: user?.id ?? "",
+  });
 
   return (
     <div className="relative group p-5 flex flex-col gap-5 border border-zinc-100 rounded-lg hover:border-zinc-200 w-[780px] animate-in slide-in-from-bottom-2 h-[366px]">

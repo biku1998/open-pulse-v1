@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import { ChartsService } from './charts.service';
 import { convertSnakeCaseObjectToCamelCase } from 'src/lib/utils';
 
@@ -7,13 +14,13 @@ export class ChartsController {
   constructor(private readonly chartsService: ChartsService) {}
 
   @Get(':id/data')
-  async getChartData(@Param('id', ParseIntPipe) id: number) {
+  async getChartData(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('userId', ParseUUIDPipe) userId: string,
+  ) {
     const events = convertSnakeCaseObjectToCamelCase(
-      await this.chartsService.getChartData(
-        id,
-        // TODO : replace hard coded user id
-        '25f3f401-74f3-4f3a-a6ee-e3b9ae52ff41',
-      ),
+      // TODO extract user id from jwt
+      await this.chartsService.getChartData(id, userId),
     );
 
     return {
