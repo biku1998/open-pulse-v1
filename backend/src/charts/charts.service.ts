@@ -33,7 +33,7 @@ export class ChartsService {
       // check if the chart has any condition and aggregations attached
       const conditions = await this.databaseService.sql<
         Tables<'chart_conditions'>[]
-      >`SELECT * FROM public.chart_conditions WHERE chart_id = ${id} AND created_by = ${userId}`;
+      >`SELECT * FROM public.chart_conditions WHERE chart_id = ${id} AND created_by = ${userId} order by created_at asc`;
 
       if (conditions.length === 0) {
         throw new BadRequestException('chart does not have any conditions');
@@ -51,17 +51,31 @@ export class ChartsService {
       const childConditionIds: number[] = [];
 
       conditions.forEach((condition) => {
-        const childConditions = conditions.filter(
-          (c) => c.parent_id === condition.id,
-        );
+        const childConditions = conditions.filter((c) => {
+          if (c.field === 'TAG_VALUE') {
+            const tagKeyCondition = conditions.find(
+              (c) => c.parent_id === condition.id,
+            );
+
+            if (!tagKeyCondition) {
+              return false;
+            }
+
+            return condition.id === tagKeyCondition.parent_id;
+          }
+
+          return c.parent_id === condition.id;
+        });
 
         if (childConditions.length === 0) {
           if (childConditionIds.includes(Number(condition.id)) === false) {
             nestedConditionsArr.push([condition]);
           }
         } else {
-          childConditionIds.push(...childConditions.map((c) => Number(c.id)));
-          nestedConditionsArr.push([condition, ...childConditions]);
+          if (condition.parent_id === null) {
+            childConditionIds.push(...childConditions.map((c) => Number(c.id)));
+            nestedConditionsArr.push([condition, ...childConditions]);
+          }
         }
       });
 
@@ -228,7 +242,6 @@ export class ChartsService {
       }
     });
 
-    this.logger.log(`whereCondition: ${whereCondition}`);
     const events = await this.databaseService.sql<Tables<'events'>[]>`
       SELECT * FROM public.events WHERE ${this.databaseService.sql.unsafe(
         whereCondition,
