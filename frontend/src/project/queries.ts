@@ -112,7 +112,7 @@ export const useFetchEvents = ({
       });
 
       const channelsInfo = await fetchChannelNamesById(
-        events.map((event) => event.channelId),
+        Array.from(new Set(events.map((event) => event.channelId))),
       );
 
       const channelsInfoById = _keyBy(channelsInfo, "id");
