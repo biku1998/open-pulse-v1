@@ -222,7 +222,7 @@ export class ChartsService {
       if (childConditions.length > 0) {
         whereCondition += '(';
         childConditions.forEach((childCondition) => {
-          whereCondition += `name ${
+          whereCondition += ` name ${
             childCondition.operator === 'EQUALS' ? '=' : '<>'
           } '${childCondition.value}' ${childCondition.logical_operator}`;
         });
@@ -230,7 +230,7 @@ export class ChartsService {
       } else {
         if (condition.parent_id === null) {
           if (whereCondition === '') {
-            whereCondition += `name ${
+            whereCondition += ` name ${
               condition.operator === 'EQUALS' ? '=' : '<>'
             } '${condition.value}'`;
           } else {

@@ -56,6 +56,7 @@ export default function CreateChartDialog() {
       chartType: "LINE",
       createdBy: user?.id,
       projectId,
+      description: null,
     },
   });
 
@@ -123,7 +124,6 @@ export default function CreateChartDialog() {
                       placeholder="description"
                       {...field}
                       value={field.value || ""}
-                      minLength={20}
                     />
                   </FormControl>
                   <FormMessage />
