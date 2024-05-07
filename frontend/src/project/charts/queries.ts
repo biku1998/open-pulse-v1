@@ -11,7 +11,8 @@ const getCharts = async (
   const { data, error } = await supabase
     .from("charts")
     .select("id, name, description, chart_type")
-    .eq("project_id", projectId);
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false });
 
   if (error) throw new Error("Failed to fetch charts");
 

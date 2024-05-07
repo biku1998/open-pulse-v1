@@ -44,6 +44,14 @@ const createChart = async (
       throw new Error("Invalid chart type was created");
   }
 
+  // NOTE: remove this later
+  // with chart we are going to create a default aggregation
+  await supabase.from("chart_aggregations").insert({
+    chart_id: data.id,
+    aggregation_type: "COUNT",
+    created_by: payload.createdBy,
+  });
+
   return convertToCamelCase<Chart>(data);
 };
 
@@ -101,14 +109,6 @@ const createChartCondition = async ({
     })
     .select()
     .single();
-
-  // NOTE: remove this later
-  // with chart we are going to create a default aggregation
-  await supabase.from("chart_aggregations").insert({
-    chart_id: payload.chartId,
-    aggregation_type: "COUNT",
-    created_by: payload.createdBy,
-  });
 
   if (error) throw new Error("Failed to create chart condition");
 
