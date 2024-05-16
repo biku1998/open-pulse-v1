@@ -1,53 +1,66 @@
 import { useQuery } from "@tanstack/react-query";
-import _keyBy from "lodash/keyBy";
 import { supabase } from "../api/supabase";
 import { convertToCamelCase } from "../lib/utils";
-import { Channel } from "../types/channel";
-import { Event } from "../types/event";
+import { EventPayload } from "../types/event";
 import { EventTag } from "../types/event-tag";
 import { eventKeys } from "./query-keys";
 
 export const fetchEvents = async ({
   projectId,
-  userId,
   channelId,
+  userId,
+  tags = [],
 }: {
   projectId: string;
   channelId?: string;
   userId?: string;
-}): Promise<Event[]> => {
+  tags?: Array<{
+    key: string;
+    value: string;
+  }>;
+}): Promise<Array<EventPayload>> => {
   const query = supabase
     .from("events")
-    .select("*")
+    .select(
+      `*,
+    channel:channels!inner (
+      id,
+      name
+    ),
+    tags: event_tags!inner (
+      id,
+      key,
+      value
+    )
+    `,
+    )
     .eq("project_id", projectId)
     .order("created_at", { ascending: false });
 
-  if (userId) {
-    query.eq("user_id", userId);
+  if (tags.length !== 0) {
+    query.in(
+      "tags.key",
+      tags.map((tag) => tag.key),
+    );
+    query.in(
+      "tags.value",
+      tags.map((tag) => tag.value),
+    );
   }
 
   if (channelId) {
-    query.eq("channel_id", channelId);
+    query.eq("channel.id", channelId);
+  }
+
+  if (userId) {
+    query.eq("user_id", userId);
   }
 
   const { data, error } = await query;
 
   if (error) throw new Error("Failed to fetch events");
 
-  return convertToCamelCase<Event[]>(data);
-};
-
-const fetchChannelNamesById = async (
-  channelIds: string[],
-): Promise<Pick<Channel, "id" | "name">[]> => {
-  const { data, error } = await supabase
-    .from("channels")
-    .select("id, name")
-    .in("id", channelIds);
-
-  if (error) throw new Error("Failed to fetch channels");
-
-  return data;
+  return convertToCamelCase<Array<EventPayload>>(data);
 };
 
 export const fetchTagsByEventIds = async ({
@@ -86,12 +99,12 @@ export const fetchTagsByEventIds = async ({
 };
 
 export const useFetchEvents = ({
-  userId,
   tags,
   projectId,
+  userId,
 }: {
   projectId: string;
-  userId?: string;
+  userId: string;
   tags?: Array<{
     key: string;
     value: string;
@@ -105,35 +118,5 @@ export const useFetchEvents = ({
         tags,
       }),
     ),
-    queryFn: async () => {
-      const events = await fetchEvents({
-        projectId,
-        userId,
-      });
-
-      const channelsInfo = await fetchChannelNamesById(
-        Array.from(new Set(events.map((event) => event.channelId))),
-      );
-
-      const channelsInfoById = _keyBy(channelsInfo, "id");
-
-      const eventTags = await fetchTagsByEventIds({
-        eventIds: events.map((event) => event.id),
-        tags,
-      });
-
-      // extract unique event ids from eventTags
-      const eventIds = Array.from(new Set(eventTags.map((tag) => tag.eventId)));
-
-      return events
-        .filter((event) => eventIds.includes(event.id))
-        .map((event) => ({
-          event,
-          channel: {
-            id: event.channelId,
-            name: channelsInfoById[event.channelId].name,
-          },
-          tags: eventTags.filter((tag) => tag.eventId === event.id),
-        }));
-    },
+    queryFn: () => fetchEvents({ projectId, userId, tags }),
   });
