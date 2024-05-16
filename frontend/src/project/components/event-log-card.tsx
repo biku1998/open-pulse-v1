@@ -19,7 +19,7 @@ type EventLogCardProps = {
     "id" | "name" | "description" | "createdAt" | "icon" | "userId"
   >;
   channel: Pick<Channel, "name" | "id">;
-  tags: Pick<EventTag, "id" | "key" | "value" | "eventId">[];
+  tags: Pick<EventTag, "id" | "key" | "value">[];
   projectId: string;
   handleDeleteEvent: () => void;
   isExpanded: boolean;

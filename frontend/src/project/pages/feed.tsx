@@ -101,7 +101,7 @@ export default function FeedPage() {
         ) : null}
 
         {fetchEventsQuery.data
-          ? fetchEventsQuery.data.map(({ event, channel, tags }) => (
+          ? fetchEventsQuery.data.map(({ channel, tags, ...event }) => (
               <EventLogCard
                 key={event.id}
                 event={event}
