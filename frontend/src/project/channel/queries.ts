@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../api/supabase";
 import { convertToCamelCase } from "../../lib/utils";
 import { Channel } from "../../types/channel";
-import { fetchEvents, fetchTagsByEventIds } from "../queries";
+import { fetchEvents } from "../queries";
 import { channelKeys } from "./query-keys";
 
 const fetchChannels = async (
@@ -41,24 +41,7 @@ export const useFetchChannelEvents = ({
   }>;
 }) =>
   useQuery({
-    queryFn: async () => {
-      const events = await fetchEvents({ projectId, channelId, userId });
-
-      const eventTags = await fetchTagsByEventIds({
-        eventIds: events.map((event) => event.id),
-        tags,
-      });
-
-      // extract unique event ids from eventTags
-      const eventIds = Array.from(new Set(eventTags.map((tag) => tag.eventId)));
-
-      return events
-        .filter((event) => eventIds.includes(event.id))
-        .map((event) => ({
-          event,
-          tags: eventTags.filter((tag) => tag.eventId === event.id),
-        }));
-    },
+    queryFn: () => fetchEvents({ projectId, channelId, userId, tags }),
     queryKey: channelKeys.eventList({
       id: channelId,
       projectId,
