@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import _keyBy from "lodash/keyBy";
 import { Hash, Rss } from "lucide-react";
 import CollapseIcon from "../../../assets/collapse-icon.svg";
 import ExpandIcon from "../../../assets/expand-icon.svg";
@@ -89,11 +88,6 @@ export default function ChannelPage() {
       confirmButtonText: "Delete",
     });
   };
-
-  const channelInfoById = _keyBy(
-    fetchChannelsQuery.data ? fetchChannelsQuery.data : {},
-    "id",
-  );
 
   return (
     <>
@@ -196,17 +190,19 @@ export default function ChannelPage() {
             ) : null}
 
             {fetchChannelEventsQuery.data && fetchChannelsQuery.data
-              ? fetchChannelEventsQuery.data.map(({ event, tags }) => (
-                  <EventLogCard
-                    key={event.id}
-                    event={event}
-                    channel={channelInfoById[event.channelId]}
-                    projectId={projectId}
-                    handleDeleteEvent={() => handleDeleteEvent(event.id)}
-                    tags={tags}
-                    isExpanded={isEventLogCardExpanded}
-                  />
-                ))
+              ? fetchChannelEventsQuery.data.map(
+                  ({ tags, channel, ...event }) => (
+                    <EventLogCard
+                      key={event.id}
+                      event={event}
+                      channel={channel}
+                      projectId={projectId}
+                      handleDeleteEvent={() => handleDeleteEvent(event.id)}
+                      tags={tags}
+                      isExpanded={isEventLogCardExpanded}
+                    />
+                  ),
+                )
               : null}
 
             {fetchChannelEventsQuery.data ? (
