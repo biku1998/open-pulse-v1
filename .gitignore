@@ -6,6 +6,7 @@
 /frontend/dist
 /frontend/.env
 /frontend/node_modules
+/supabase/.temp
 
 # dependencies
 /node_modules
