@@ -1,1 +1,3 @@
-# Open pulse v1
+# Open pulse
+
+Open source event monitoring platform
